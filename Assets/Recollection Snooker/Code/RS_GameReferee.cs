@@ -22,8 +22,7 @@ namespace MrSanmi.RecollectionSnooker
         NAVIGATING_SHIP_OF_THE_PLAYER, //Including loading treasures to the island
         ANCHOR_SHIP,
         CANNON_CARGO,
-        LOADING_CARGO_BY_PLAYER,
-        ORGANIZE_CARGO_BY_PLAYER,
+        LOADING_AND_ORGANIZING_CARGO_BY_PLAYER,
         MOVE_COUNTER_BY_SANCTION,
         //END OF THE TURN
         SHIFT_MONSTER_PARTS,
@@ -108,11 +107,8 @@ namespace MrSanmi.RecollectionSnooker
                 case RS_GameStates.CANNON_CARGO:
                     ExecutingCannonCargoState();
                     break;
-                case RS_GameStates.LOADING_CARGO_BY_PLAYER:
-                    ExecutingLoadingCargoByPlayerState();
-                    break;
-                case RS_GameStates.ORGANIZE_CARGO_BY_PLAYER:
-                    ExecutingOrganizeCargoByPlayerState();
+                case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
+                    ExecutingLoadingAndOrganizingCargoByPlayerState();
                     break;
                 case RS_GameStates.MOVE_COUNTER_BY_SANCTION:
                     ExecutingMoveCounterBySanctionState();
@@ -188,14 +184,8 @@ namespace MrSanmi.RecollectionSnooker
                         FinalizeCurrentState(toNextState);
                     }
                     break;
-                case RS_GameStates.LOADING_CARGO_BY_PLAYER:
+                case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
                     if (_gameState == RS_GameStates.CANNON_CARGO)
-                    {
-                        FinalizeCurrentState(toNextState);
-                    }
-                    break;
-                case RS_GameStates.ORGANIZE_CARGO_BY_PLAYER:
-                    if (_gameState == RS_GameStates.LOADING_CARGO_BY_PLAYER)
                     {
                         FinalizeCurrentState(toNextState);
                     }
@@ -207,7 +197,7 @@ namespace MrSanmi.RecollectionSnooker
                     }
                     break;
                 case RS_GameStates.SHIFT_MONSTER_PARTS:
-                    if (_gameState == RS_GameStates.ORGANIZE_CARGO_BY_PLAYER ||
+                    if (_gameState == RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER ||
                         _gameState == RS_GameStates.MOVE_COUNTER_BY_SANCTION)
                     {
                         FinalizeCurrentState(toNextState);
@@ -288,11 +278,8 @@ namespace MrSanmi.RecollectionSnooker
                 case RS_GameStates.CANNON_CARGO:
                     InitializeCannonCargoState();
                     break;
-                case RS_GameStates.LOADING_CARGO_BY_PLAYER:
-                    InitializeLoadingCargoByPlayerState();
-                    break;
-                case RS_GameStates.ORGANIZE_CARGO_BY_PLAYER:
-                    InitializeOrganizeCargoByPlayerState();
+                case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
+                    InitializeLoadingAndOrganizingCargoByPlayerState();
                     break;
                 case RS_GameStates.MOVE_COUNTER_BY_SANCTION:
                     InitializeMoveCounterBySanctionState();
@@ -337,14 +324,8 @@ namespace MrSanmi.RecollectionSnooker
                 case RS_GameStates.CANNON_CARGO:
                     FinalizeCannonCargoState();
                     break;
-                case RS_GameStates.LOADING_CARGO_BY_PLAYER:
-                    FinalizeLoadingCargoByPlayerState();
-                    break;
-                case RS_GameStates.ORGANIZE_CARGO_BY_PLAYER:
-                    FinalizeOrganizeCargoByPlayerState();
-                    break;
-                case RS_GameStates.MOVE_COUNTER_BY_SANCTION:
-                    FinalizeMoveCounterBySanctionState();
+                case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
+                    FinalizeLoadingAndOrganizingCargoByPlayerState();
                     break;
                 case RS_GameStates.SHIFT_MONSTER_PARTS:
                     FinalizeShiftMonsterPartsState();
@@ -506,6 +487,8 @@ namespace MrSanmi.RecollectionSnooker
             _currentFlag.gameObject.SetActive(false);
             _nearestCargoToTheShip.gameObject.SetActive(true);
             _nearestCargoToTheShip = null;
+
+
         }
 
         #endregion
@@ -571,7 +554,8 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeCannonCargoState()
         {
-            _nearestCargoToTheShip.gameObject.SetActive(true);
+            Debug.Log("Ahhhhhhhhhhhhhhhhhhhhhhhh");
+            _nearestCargoToTheShip?.gameObject.SetActive(true);
             _nearestCargoToTheShip = null;
 
             foreach (Cargo cargo in allCargoOfTheGame)
@@ -582,7 +566,7 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void ExecutingCannonCargoState()
         {
-            if (!IsAllCargoStill())
+            if (IsAllCargoStill())
             {
                 GameStateMechanic(RS_GameStates.CHOOSE_TOKEN_BY_PLAYER);
                 //TODO: Pending validation events while the cannon was executing
@@ -594,43 +578,27 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void FinalizeCannonCargoState()
         {
-
+            foreach (Cargo cargo in allCargoOfTheGame)
+            {
+                cargo.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+            }
         }
 
         #endregion
 
-        #region LoadingCargoByPlayer
+        #region LoadingAndOrganizingCargoByPlayer
 
-        protected void InitializeLoadingCargoByPlayerState()
+        protected void InitializeLoadingAndOrganizingCargoByPlayerState()
         {
 
         }
 
-        protected void ExecutingLoadingCargoByPlayerState()
+        protected void ExecutingLoadingAndOrganizingCargoByPlayerState()
         {
 
         }
 
-        protected void FinalizeLoadingCargoByPlayerState()
-        {
-
-        }
-
-        #endregion
-
-        #region OrganizeCargoByPlayer
-
-        protected void InitializeOrganizeCargoByPlayerState()
-        {
-
-        }
-
-        protected void ExecutingOrganizeCargoByPlayerState()
-        {
-
-        }
-
-        protected void FinalizeOrganizeCargoByPlayerState()
+        protected void FinalizeLoadingAndOrganizingCargoByPlayerState()
         {
 
         }
@@ -660,7 +628,10 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeShiftMonsterPartsState()
         {
-
+            foreach(MonsterPart monsterPart in allMonsterPartOfTheGame)
+            {
+                monsterPart.ValidateSpaceToSpawnMonsterPart();
+            }
         }
 
         protected void ExecutingShiftMonsterPartsState()

@@ -35,6 +35,9 @@ namespace MrSanmi.RecollectionSnooker
         #region RuntimeVariables
 
         protected Vector3 _pushDirection;
+        protected RaycastHit _raycastHit;
+        protected bool canBePlacedAtThePosition;
+        Vector3 _randomPosToPlaceToken;
 
         #endregion
 
@@ -84,9 +87,26 @@ namespace MrSanmi.RecollectionSnooker
 
         #region PublicMethods
 
+        public void ValidateSpaceToSpawnMonsterPart()
+        {
+            if(monsterPartType == MonsterPartType.LIMB)
+            {
+                //_randomPosToPlaceToken = new Vector3();
+                if (Physics.SphereCast(transform.position, 0.5f, -transform.up, out _raycastHit, 1.0f))
+                {
+
+                }
+            }
+        }
+
         #endregion
 
         #region GettersSetters
+
+        public bool CanBePlacedAtThePosition
+        {
+            get { return canBePlacedAtThePosition; }
+        }
 
         #endregion
     }

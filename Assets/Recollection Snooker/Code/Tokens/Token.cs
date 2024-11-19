@@ -92,6 +92,10 @@ namespace MrSanmi.RecollectionSnooker
 
         protected virtual void ValidateReferences()
         {
+            if (_tokenPhysicalFSM == null)
+            {
+                _tokenPhysicalFSM = gameObject.GetComponent<RS_TokenFiniteStateMachine>();
+            }
             if (_gameReferee == null)
             {
                 _gameReferee = GameObject.FindAnyObjectByType<RS_GameReferee>();

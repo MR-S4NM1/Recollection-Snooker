@@ -79,7 +79,8 @@ namespace MrSanmi.RecollectionSnooker
         {
             if (_physicalState == TokenPhysicalStates.PHYSICAL)
             {
-                isStill = _rigidbody.velocity.magnitude < 2f &&
+                isStill = _rigidbody.GetAccumulatedForce().magnitude < 0.1f &&
+                    _rigidbody.velocity.magnitude < 0.1f &&
                     _rigidbody.angularVelocity.magnitude < 0.1f;
             }
             else //STATIC or GHOST
@@ -176,6 +177,7 @@ namespace MrSanmi.RecollectionSnooker
             _meshCollider.enabled = true;
             _physicalState = TokenPhysicalStates.PHYSICAL;
             _meshRenderer.material = materialAssets.physicalMaterial;
+            Debug.Log("I´m physical!");
         }
 
         protected virtual void InitializeStaticState()
