@@ -1,53 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
-public class RacyastTest : MonoBehaviour
+[CustomEditor(typeof(SphereCastTest))]
+public class SphereCastTest_Editor : Editor
 {
-    #region Knobs/Parameters
+    protected SphereCastTest _target;
 
-    public Transform originOfTheRay;
-    public Transform targetOfTheRay;
-    public string[] layerMask;
-
-    #endregion
-
-    #region RuntimeVariables
-
-    [SerializeField] protected Ray _ray;
-    protected RaycastHit _raycastHit;
-    protected float _magnitudeOfTheRay;
-    protected Color _colorOfTheRay;
-
-    #endregion
-
-    void Start()
+    public override void OnInspectorGUI()
     {
-        //_ray = new Ray(); //to avoid "new" you can implement SerializeField
+        DrawDefaultInspector();
+        _target = (SphereCastTest)target;
+        if (GUILayout.Button("Project Sphere Cast"))
+        {
+            _target.SphereCast();
+        }
     }
 
-    
-    void FixedUpdate()
-    {
-        _ray.origin = originOfTheRay.transform.position;
-        _ray.direction = (targetOfTheRay.transform.position - originOfTheRay.transform.position).normalized;
-        _magnitudeOfTheRay = (targetOfTheRay.transform.position - originOfTheRay.transform.position).magnitude;
-
-        if (Physics.Raycast(_ray, out _raycastHit, _magnitudeOfTheRay, LayerMask.GetMask(layerMask)))
-        {
-            Debug.Log("I hitted someone with the name: " + _raycastHit.collider.gameObject.name);
-            _colorOfTheRay = Color.green;
-        }
-        else
-        {
-            _colorOfTheRay = Color.red;
-        }
-
-        Debug.DrawRay(
-            _ray.origin,
-            _ray.direction * _magnitudeOfTheRay,
-            _colorOfTheRay,
-            Time.fixedDeltaTime
-            );
-    }
 }

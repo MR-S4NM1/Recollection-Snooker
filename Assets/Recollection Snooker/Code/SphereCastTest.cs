@@ -8,10 +8,16 @@ public class SphereCastTest : MonoBehaviour
 
     public void SphereCast()
     {
-        if(Physics.SphereCast(transform.position, 1.0f, Vector3.zero, out _raycastHit))
+        Debug.DrawRay(transform.position, -transform.up * 1.0f, Color.red, 1f);
+        if (Physics.SphereCast(transform.position, 0.5f, -transform.up, out _raycastHit, 1.0f))
         {
-            Debug.LogWarning("Hit with the Sphere cast");
-            Debug.Break();
+            Debug.LogWarning("Hitted with the Sphere Cast " + _raycastHit.collider.gameObject.name);
+            //Debug.Break(); //Pause on the editor
+        }
+        else
+        {
+            Debug.LogWarning("Hitted NOTHING");
         }
     }
 }
+

@@ -48,6 +48,13 @@ namespace MrSanmi.RecollectionSnooker
             base.InitializeToken();
         }
 
+        private void OnDrawGizmos()
+        {
+            #if UNITY_EDITOR
+            ValidateReferences();
+            #endif
+        }
+
         void Update()
         {
 
@@ -61,7 +68,7 @@ namespace MrSanmi.RecollectionSnooker
         private void OnCollisionStay(Collision other)
         {
             if (this.monsterPartType == MonsterPartType.HEAD
-                && (other.gameObject.tag == "Dice" || other.gameObject.tag == "Cargo")
+                && (other.gameObject.CompareTag("Cargo"))
                 )
             {
                 //Debug.Log("Push from " + gameObject.name + " to " + other.gameObject.name);
@@ -71,17 +78,9 @@ namespace MrSanmi.RecollectionSnooker
             }
         }
 
-        private void OnDrawGizmos()
-        {
-            #if UNITY_EDITOR
-            ValidateReferences();
-            #endif
-        }
-
         #endregion
 
         #region RuntimeMethods
-
 
         #endregion
 
@@ -91,11 +90,34 @@ namespace MrSanmi.RecollectionSnooker
         {
             if(monsterPartType == MonsterPartType.LIMB)
             {
-                //_randomPosToPlaceToken = new Vector3();
-                if (Physics.SphereCast(transform.position, 0.5f, -transform.up, out _raycastHit, 1.0f))
-                {
+                canBePlacedAtThePosition = false;
 
+                while (canBePlacedAtThePosition == false)
+                {
+                    _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+                    _randomPosToPlaceToken = new Vector3(Random.Range(-20, 20), 0, Random.Range(-20, 20));
+                    transform.position = _randomPosToPlaceToken;
+                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 1.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
+                    {
+                        Debug.LogWarning("Hitted with the Sphere Cast " + _raycastHit.collider.gameObject.name);
+                        Debug.Break();
+                        if (_raycastHit.collider.gameObject.GetComponent<Token>())
+                        {
+                            canBePlacedAtThePosition = false;
+                            print("Noooooooooooooo");
+                            transform.position = _randomPosToPlaceToken;
+                            _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+                        }
+                        else
+                        {
+                            canBePlacedAtThePosition = true;
+                            print("Siiiiiiiiiiiiiii");
+                            _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_PHYSICS);
+                            transform.position = _randomPosToPlaceToken;
+                        }
+                    }
                 }
+                print(canBePlacedAtThePosition);
             }
         }
 

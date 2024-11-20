@@ -198,7 +198,9 @@ namespace MrSanmi.RecollectionSnooker
                     break;
                 case RS_GameStates.SHIFT_MONSTER_PARTS:
                     if (_gameState == RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER ||
-                        _gameState == RS_GameStates.MOVE_COUNTER_BY_SANCTION)
+                        _gameState == RS_GameStates.MOVE_COUNTER_BY_SANCTION ||
+                        _gameState == RS_GameStates.CANNON_CARGO ||
+                        _gameState == RS_GameStates.CANNON_BY_NAVIGATION)
                     {
                         FinalizeCurrentState(toNextState);
                     }
@@ -568,7 +570,7 @@ namespace MrSanmi.RecollectionSnooker
         {
             if (IsAllCargoStill())
             {
-                GameStateMechanic(RS_GameStates.CHOOSE_TOKEN_BY_PLAYER);
+                GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
                 //TODO: Pending validation events while the cannon was executing
                 //A) LOAD_CARGO_BY_PLAYER
                 //B) MOVE_COUNTER
@@ -628,7 +630,7 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeShiftMonsterPartsState()
         {
-            foreach(MonsterPart monsterPart in allMonsterPartOfTheGame)
+            foreach (MonsterPart monsterPart in allMonsterPartOfTheGame)
             {
                 monsterPart.ValidateSpaceToSpawnMonsterPart();
             }
