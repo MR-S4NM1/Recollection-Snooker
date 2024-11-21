@@ -177,7 +177,6 @@ namespace MrSanmi.RecollectionSnooker
             _meshCollider.enabled = true;
             _physicalState = TokenPhysicalStates.PHYSICAL;
             _meshRenderer.material = materialAssets.physicalMaterial;
-            Debug.Log("I´m physical!");
         }
 
         protected virtual void InitializeStaticState()

@@ -47,6 +47,8 @@ namespace MrSanmi.RecollectionSnooker
         [SerializeField] protected GameplayAttributes _gameplayAttributes;
         protected Transform _flagTransform;
         protected Flag _contactedFlag;
+        protected bool _cargoOrShipPivotHaveTouchedAMonsterPart;
+        protected bool _shipPivotHasTouchedACargo;
 
         #endregion
 
@@ -57,17 +59,17 @@ namespace MrSanmi.RecollectionSnooker
             InitializeToken();
         }
 
-        void FixedUpdate()
-        {
-            
-        }
-
         private void OnCollisionEnter(Collision other)
         {
             _gameReferee.DebugInMobile(gameObject.name + 
                 " OnCollisionEnter() - Detected collision with " + 
                 other.gameObject.name);
-            //ValidateCollision(other);
+            ValidateCollisionDuringCannon(other);
+        }
+
+        private void OnCollisionStay(Collision other)
+        {
+            ValidateCollisionDuringCannon(other);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -108,6 +110,22 @@ namespace MrSanmi.RecollectionSnooker
             {
                 _freeLookCamera = transform.GetChild(0).GetChild(0).GetComponent<CinemachineFreeLook>();
                 //_freeLookCamera = transform.GetComponentInChildren<CinemachineFreeLook>();
+            }
+        }
+
+        public virtual void ValidateCollisionDuringCannon(Collision other)
+        {
+            if (_gameReferee.GetGameState == RS_GameStates.CANNON_CARGO ||
+            _gameReferee.GetGameState == RS_GameStates.CANNON_BY_NAVIGATION)
+            {
+                if (this as ShipPivot || this as Cargo)
+                {
+                    if (other.gameObject.CompareTag("MonsterLimb"))
+                    {
+                        print("You lose a life");
+                        _gameReferee.SetGameRefereeHasConfirmedThatNoCargoOrShipPivotHaveTouchedAMonsterPart = true;
+                    }
+                }
             }
         }
 
@@ -176,6 +194,8 @@ namespace MrSanmi.RecollectionSnooker
                 _tokenPhysicalFSM = GetComponent<RS_TokenFiniteStateMachine>();
             }
             ValidateReferences();
+
+            _cargoOrShipPivotHaveTouchedAMonsterPart = false;
         }
 
         #endregion
@@ -211,6 +231,11 @@ namespace MrSanmi.RecollectionSnooker
         public CinemachineFreeLook GetFreeLookCamera
         {
             get { return _freeLookCamera; }
+        }
+
+        public bool GetCargoOrShipPivotHaveTouchedAMonsterPart
+        {
+            get { return _cargoOrShipPivotHaveTouchedAMonsterPart; }
         }
 
         #endregion

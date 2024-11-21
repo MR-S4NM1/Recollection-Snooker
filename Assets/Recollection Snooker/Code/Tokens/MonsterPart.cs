@@ -99,19 +99,16 @@ namespace MrSanmi.RecollectionSnooker
                     transform.position = _randomPosToPlaceToken;
                     if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 1.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
                     {
-                        Debug.LogWarning("Hitted with the Sphere Cast " + _raycastHit.collider.gameObject.name);
-                        Debug.Break();
                         if (_raycastHit.collider.gameObject.GetComponent<Token>())
                         {
-                            canBePlacedAtThePosition = false;
-                            print("Noooooooooooooo");
-                            transform.position = _randomPosToPlaceToken;
                             _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+                            canBePlacedAtThePosition = false;
+                            transform.position = _randomPosToPlaceToken;
+                            
                         }
                         else
                         {
                             canBePlacedAtThePosition = true;
-                            print("Siiiiiiiiiiiiiii");
                             _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_PHYSICS);
                             transform.position = _randomPosToPlaceToken;
                         }

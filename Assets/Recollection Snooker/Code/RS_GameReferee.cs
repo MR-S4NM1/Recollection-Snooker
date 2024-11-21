@@ -48,6 +48,7 @@ namespace MrSanmi.RecollectionSnooker
 
         [Header("Camera References")]
         [SerializeField] protected CinemachineFreeLook tableFreeLookCamera;
+        [SerializeField] protected CinemachineVirtualCamera shipVirtualCamera;
 
         [Header("Flags")]
         [SerializeField] protected GameObject flag;
@@ -62,12 +63,15 @@ namespace MrSanmi.RecollectionSnooker
         #region RuntimeVariables
 
         protected new RS_GameStates _gameState;
-        protected CinemachineFreeLook _currentFreeLookCamera;
-        [SerializeField] protected GameObject _currentFlag;
+        protected CinemachineVirtualCameraBase _currentVirtualCameraBase;
         protected Token _interactedToken;
         [SerializeField] protected bool _isAllCargoStill;
         protected int _randomTokenPos;
         protected Cargo _nearestCargoToTheShip;
+        protected bool _gameRefereeHasConfirmedThatACargoOrShipPivotHaveTouchedAMonsterPart;
+        [SerializeField] protected Cargo _cargoToBeLoaded;
+        protected bool _aCargoHasTouchedTheShip;
+        protected Vector3 _originalPositionOfTheFlag;
 
         #endregion
 
@@ -141,7 +145,7 @@ namespace MrSanmi.RecollectionSnooker
             switch (toNextState)
             {
                 case RS_GameStates.CHOOSE_TOKEN_BY_PLAYER:
-                    if (_gameState == RS_GameStates.CANNON_CARGO ||
+                    if (_gameState == RS_GameStates.SHIFT_MONSTER_PARTS ||
                         _gameState == RS_GameStates.SHOW_THE_LAYOUT_TO_THE_PLAYER)
                     {
                         FinalizeCurrentState(toNextState);
@@ -350,6 +354,16 @@ namespace MrSanmi.RecollectionSnooker
                 );
         }
 
+        protected void ChangeCameraTo(CinemachineVirtualCameraBase nextCamera)
+        {
+            if (_currentVirtualCameraBase != null)
+            {
+                _currentVirtualCameraBase.Priority = 1;
+            }
+            _currentVirtualCameraBase = nextCamera;
+            _currentVirtualCameraBase.Priority = 1000;
+        }
+
         #endregion
 
         //for every state, we will handle
@@ -362,6 +376,10 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeShowTheLayoutToThePlayerState()
         {
+            _originalPositionOfTheFlag = flag.transform.localPosition;
+            _aCargoHasTouchedTheShip = false;
+            _gameRefereeHasConfirmedThatACargoOrShipPivotHaveTouchedAMonsterPart = false;
+
             //TODO: Make the proper initialization of the state
 
             // Putting all cargo at random positions in order to have some variety at the beginning of each game session
@@ -414,12 +432,7 @@ namespace MrSanmi.RecollectionSnooker
             //TODO: Set Spooky for ships, monster parts and ship pivots
 
             //Activate the table camera (with the highest priority)
-            if (_currentFreeLookCamera != null)
-            {
-                _currentFreeLookCamera.Priority = 1;
-            }
-            _currentFreeLookCamera = tableFreeLookCamera;
-            _currentFreeLookCamera.Priority = 1000;
+            ChangeCameraTo(tableFreeLookCamera);
 
             //Check available cargo for flicking
             foreach (Cargo cargo in allCargoOfTheGame)
@@ -440,7 +453,7 @@ namespace MrSanmi.RecollectionSnooker
         protected void FinalizeChooseTokenByPlayerState()
         {
             //table free look camera
-            _currentFreeLookCamera.Priority = 1;
+            _currentVirtualCameraBase.Priority = 1;
         }
 
         #endregion ChooseTokenByPlayer
@@ -451,8 +464,8 @@ namespace MrSanmi.RecollectionSnooker
         {
             _interactedToken.StateMechanic(TokenStateMechanic.SET_PHYSICS);
             //Focus to the camera rig of the selected token
-            _currentFreeLookCamera = _interactedToken.GetFreeLookCamera;
-            _currentFreeLookCamera.Priority = 1000;
+            _currentVirtualCameraBase = _interactedToken.GetFreeLookCamera;
+            _currentVirtualCameraBase.Priority = 1000;
         }
 
         protected void ExecutingContactPointTokenByPlayerState()
@@ -473,9 +486,10 @@ namespace MrSanmi.RecollectionSnooker
         {
             //this virtual camera hasn't changed from the previous
             //state, so this is the camera from the selected token
-            _currentFreeLookCamera.gameObject.GetComponent<CinemachineMobileInputProvider>().enableCameraRig = false;
-            _currentFreeLookCamera.m_YAxis.Value = 0.0f;
-            _currentFlag.gameObject.SetActive(true);
+            _currentVirtualCameraBase.gameObject.GetComponent<CinemachineMobileInputProvider>().enableCameraRig = false;
+            CinemachineFreeLook tempCam = (CinemachineFreeLook)_currentVirtualCameraBase;
+            tempCam.m_YAxis.Value = 0.0f;
+            flag.gameObject.SetActive(true);
         }
 
         protected void ExecutingFlickTokenByPlayerState()
@@ -485,12 +499,11 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void FinalizeFlickTokenByPlayerState()
         {
-            _currentFlag.transform.localRotation = Quaternion.identity;
-            _currentFlag.gameObject.SetActive(false);
+            flag.gameObject.SetActive(false);
+            flag.transform.localRotation = Quaternion.identity;
+            flag.gameObject.transform.localPosition = _originalPositionOfTheFlag;
             _nearestCargoToTheShip.gameObject.SetActive(true);
             _nearestCargoToTheShip = null;
-
-
         }
 
         #endregion
@@ -556,9 +569,9 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeCannonCargoState()
         {
-            Debug.Log("Ahhhhhhhhhhhhhhhhhhhhhhhh");
             _nearestCargoToTheShip?.gameObject.SetActive(true);
             _nearestCargoToTheShip = null;
+            _gameRefereeHasConfirmedThatACargoOrShipPivotHaveTouchedAMonsterPart = false;
 
             foreach (Cargo cargo in allCargoOfTheGame)
             {
@@ -570,7 +583,22 @@ namespace MrSanmi.RecollectionSnooker
         {
             if (IsAllCargoStill())
             {
-                GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+                if (_gameRefereeHasConfirmedThatACargoOrShipPivotHaveTouchedAMonsterPart)
+                {
+                    GameStateMechanic(RS_GameStates.MOVE_COUNTER_BY_SANCTION);
+                }
+                else
+                {
+                    if ((_aCargoHasTouchedTheShip) && (_cargoToBeLoaded != null))
+                    {
+                        GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
+                    }
+                    else
+                    {
+                        GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+                    }
+                }
+
                 //TODO: Pending validation events while the cannon was executing
                 //A) LOAD_CARGO_BY_PLAYER
                 //B) MOVE_COUNTER
@@ -592,7 +620,16 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeLoadingAndOrganizingCargoByPlayerState()
         {
+            ChangeCameraTo(shipVirtualCamera);
 
+            foreach(Cargo cargo in allCargoOfTheGame)
+            {
+                if(cargo != _cargoToBeLoaded)
+                {
+                    cargo.gameObject.SetActive(false);
+                }
+            }
+            _cargoToBeLoaded.StateMechanic(TokenStateMechanic.SET_SPOOKY);
         }
 
         protected void ExecutingLoadingAndOrganizingCargoByPlayerState()
@@ -602,7 +639,15 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void FinalizeLoadingAndOrganizingCargoByPlayerState()
         {
+            foreach (Cargo cargo in allCargoOfTheGame)
+            {
+                cargo.gameObject.SetActive(true);
+                _cargoToBeLoaded.StateMechanic(TokenStateMechanic.SET_PHYSICS);
+            }
 
+            _cargoToBeLoaded.gameObject.SetActive(true);
+
+            _cargoToBeLoaded = null;
         }
 
         #endregion
@@ -634,6 +679,8 @@ namespace MrSanmi.RecollectionSnooker
             {
                 monsterPart.ValidateSpaceToSpawnMonsterPart();
             }
+
+            GameStateMechanic(RS_GameStates.CHOOSE_TOKEN_BY_PLAYER);
         }
 
         protected void ExecutingShiftMonsterPartsState()
@@ -705,7 +752,23 @@ namespace MrSanmi.RecollectionSnooker
 
         public GameObject GetCurrentFlag
         {
-            get { return _currentFlag; }
+            get { return flag; }
+        }
+
+        public bool SetGameRefereeHasConfirmedThatNoCargoOrShipPivotHaveTouchedAMonsterPart
+        {
+            set { _gameRefereeHasConfirmedThatACargoOrShipPivotHaveTouchedAMonsterPart = value; }
+        }
+
+        public Cargo CargoToBeLoaded
+        {
+            set { _cargoToBeLoaded = value; }
+            get { return _cargoToBeLoaded; }
+        }
+
+        public bool SetACargoHasTouchedTheShip
+        {
+            set { _aCargoHasTouchedTheShip = value; }
         }
 
         #endregion

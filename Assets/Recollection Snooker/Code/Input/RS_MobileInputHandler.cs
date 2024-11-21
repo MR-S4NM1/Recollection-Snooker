@@ -13,6 +13,7 @@ namespace MrSanmi.RecollectionSnooker
         [SerializeField] protected GameObject _goTouchCursor;
         [SerializeField] protected Camera _camera;
         [SerializeField] protected RS_GameReferee _gameReferee;
+        [SerializeField] protected LayerMask _layerMaskOfTheToken;
 
         #endregion
 
@@ -33,7 +34,7 @@ namespace MrSanmi.RecollectionSnooker
 
         private void FixedUpdate()
         {
-            
+
         }
 
         #endregion
@@ -49,6 +50,9 @@ namespace MrSanmi.RecollectionSnooker
                     break;
                 case RS_GameStates.CONTACT_POINT_TOKEN_BY_PLAYER:
                     HandleTouchInContactPointTokenByPlayer(value);
+                    break;
+                case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
+                    HandleTouchInLoadingCargoByPlayer(value);
                     break;
             }
         }
@@ -78,13 +82,18 @@ namespace MrSanmi.RecollectionSnooker
         {
             if (value.performed)
             {
-                
+
             }
             else if (value.canceled)
             {
 
             }
         }
+
+        //protected override void HandleLoadingCargoTranslateInputAction(InputAction.CallbackContext value)
+        //{
+            
+        //}
 
         #endregion
 
@@ -154,6 +163,31 @@ namespace MrSanmi.RecollectionSnooker
             }
         }
 
+        protected void HandleTouchInLoadingCargoByPlayer(InputAction.CallbackContext value)
+        {
+            if (value.performed)
+            {
+                if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),
+                    out _raycastHit, 50.0f, LayerMask.GetMask("CargoSpace")))
+                {
+                    print("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+                    _goTouchCursor.SetActive(true);
+                    _goTouchCursor.transform.position = _raycastHit.point;
+                    _gameReferee.CargoToBeLoaded.gameObject.transform.position = Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,
+                        _raycastHit.point, 0.5f);
+                }
+                else
+                {
+                    _goTouchCursor.SetActive(false);
+                }
+            }
+            else if (value.canceled)
+            {
+                _goTouchCursor.SetActive(false);
+                _gameReferee.GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+            }
+        }
+
         #endregion HandleTouchActions
 
         #region HandleRotationActions
@@ -163,15 +197,9 @@ namespace MrSanmi.RecollectionSnooker
             if (value.performed)
             {
                 _gameReferee.GetCurrentFlag.transform.Rotate(
-                new Vector3(
-                        (value.ReadValue<Vector3>() != null ? 
-                        value.ReadValue<Vector3>().x : 
-                        value.ReadValue<Vector2>().x) * -4f, //X
-                        0f,                             //Y
-                        0f                              //Z
-                    ),
-                    Space.Self //localRotation
-                );
+                new Vector3((value.ReadValue<Vector3>() != null ? 
+                value.ReadValue<Vector3>().x : value.ReadValue<Vector2>().x) * 
+                -4f, 0f, 0f), Space.Self);
             }
             else if (value.canceled)
             {

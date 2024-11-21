@@ -80,6 +80,18 @@ namespace MrSanmi.RecollectionSnooker
             }
         }
 
+        protected virtual void HandleLoadingCargoTranslateInputAction(InputAction.CallbackContext value)
+        {
+            if (value.performed)
+            {
+
+            }
+            else if (value.canceled)
+            {
+
+            }
+        }
+
         #endregion
 
         #region InputHandlingEvents
