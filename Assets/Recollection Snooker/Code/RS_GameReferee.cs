@@ -58,6 +58,9 @@ namespace MrSanmi.RecollectionSnooker
         [Header("Random Token Positions")]
         [SerializeField] protected List<Transform> tokenPosList;
 
+        [Header("Health Points")]
+        [SerializeField] protected int healthPoints;
+
         #endregion
 
         #region RuntimeVariables
@@ -656,7 +659,9 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeMoveCounterBySanctionState()
         {
-
+            healthPoints -= 1;
+            print(healthPoints);
+            GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
         }
 
         protected void ExecutingMoveCounterBySanctionState()
