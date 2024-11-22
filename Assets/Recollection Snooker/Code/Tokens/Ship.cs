@@ -29,7 +29,7 @@ namespace MrSanmi.RecollectionSnooker
         #region RuntimeVariables
 
         [SerializeField] protected Cargo[] _cargos;
-        [SerializeField] protected List<Cargo> _cargoes;
+        [SerializeField] public List<Cargo> _cargoesLoaded;
         //List<float> _cargosPos; //classes are normally instanciated at the Start / Awake method
         Cargo _nearestCargo;
         float _nearestDistance;
@@ -43,7 +43,7 @@ namespace MrSanmi.RecollectionSnooker
         void Start()
         {
             base.InitializeToken();
-            _cargoes = new List<Cargo>();
+            _cargoesLoaded = new List<Cargo>();
             //We obtain all cargo in scene in order to know which one is the nearest, and then save them in an array.
             _cargos = GameObject.FindObjectsOfType<Cargo>(true);
             //_cargosPos = new List<float>();  //runtime variable
@@ -66,9 +66,48 @@ namespace MrSanmi.RecollectionSnooker
             #endif
         }
 
-        private void OnCollisionEnter(Collision other)
+        //private void OnCollisionEnter(Collision other)
+        //{
+        //    ValidateCollisionCargo(other);
+        //}
+
+        //private void OnCollisionStay(Collision other)
+        //{
+        //    ValidateCollisionCargo(other);
+        //}
+
+        private void OnTriggerEnter(Collider other)
         {
-            if (other.collider.CompareTag("Cargo"))
+            ValidateTriggerCargo(other);
+        }
+
+        #endregion
+
+        #region RuntimeMethods
+
+        //void ValidateCollisionCargo(Collision other)
+        //{
+        //    if (other.collider.CompareTag("Cargo"))
+        //    {
+        //        switch (_gameReferee.GetGameState)
+        //        {
+        //            case RS_GameStates.CANNON_CARGO:
+        //                _gameReferee.SetACargoHasTouchedTheShip = true;
+        //                break;
+        //            case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
+        //            case RS_GameStates.SHIFT_MONSTER_PARTS:
+        //                if ((!other.gameObject.GetComponent<Cargo>().IsLoaded) && (other.gameObject.name == _gameReferee._lastCargoLoaded))
+        //                {
+        //                    _cargoesLoaded.Add(other.gameObject.GetComponent<Cargo>());
+        //                }
+        //                break;
+        //        }
+        //    }
+        //}
+
+        void ValidateTriggerCargo(Collider other)
+        {
+            if (other.CompareTag("Cargo"))
             {
                 switch (_gameReferee.GetGameState)
                 {
@@ -76,18 +115,15 @@ namespace MrSanmi.RecollectionSnooker
                         _gameReferee.SetACargoHasTouchedTheShip = true;
                         break;
                     case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
-                        if (!other.gameObject.GetComponent<Cargo>().IsLoaded)
+                        if ((!other.gameObject.GetComponent<Cargo>().IsLoaded) &&
+                            !_cargoesLoaded.Contains(other.gameObject.GetComponent<Cargo>()))
                         {
-                            _cargoes.Add(other.gameObject.GetComponent<Cargo>());
+                            _cargoesLoaded.Add(other.gameObject.GetComponent<Cargo>());
                         }
                         break;
                 }
             }
         }
-
-        #endregion
-
-        #region RuntimeMethods
 
 
         #endregion
@@ -102,7 +138,7 @@ namespace MrSanmi.RecollectionSnooker
             //We calculate the distance between all cargo and the ship.
             for (int i = 0; i < _cargos.Length - 1; ++i)
             {
-                if (!_cargos[i].GetComponent<Cargo>().IsLoaded)
+                if (!_cargos[i].IsLoaded)
                 {
                     _currentDistance = Vector3.SqrMagnitude(this.gameObject.transform.position - _cargos[i].gameObject.transform.position);
                     //_cargosPos.Add(_currentDistance);

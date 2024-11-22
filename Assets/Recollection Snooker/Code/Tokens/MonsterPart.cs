@@ -88,25 +88,39 @@ namespace MrSanmi.RecollectionSnooker
 
         public void ValidateSpaceToSpawnMonsterPart()
         {
-            if(monsterPartType == MonsterPartType.LIMB)
+            if (monsterPartType == MonsterPartType.HEAD)
             {
                 canBePlacedAtThePosition = false;
 
-                while (canBePlacedAtThePosition == false)
+                while (!canBePlacedAtThePosition)
                 {
                     _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
                     _randomPosToPlaceToken = new Vector3(Random.Range(-20, 20), 0, Random.Range(-20, 20));
                     transform.position = _randomPosToPlaceToken;
-                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 1.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
+                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 10.0f, _randomPosToPlaceToken.z), 5.0f, -transform.up * 1.0f, out _raycastHit, 10.0f))
                     {
-                        if (_raycastHit.collider.gameObject.GetComponent<Token>())
+                        if (!_raycastHit.collider.gameObject.GetComponent<Token>())
                         {
-                            _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
-                            canBePlacedAtThePosition = false;
+                            canBePlacedAtThePosition = true;
+                            _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_RIGID);
                             transform.position = _randomPosToPlaceToken;
-                            
                         }
-                        else
+                    }
+                }
+                print(canBePlacedAtThePosition);
+            }
+            else if (monsterPartType == MonsterPartType.LIMB)
+            {
+                canBePlacedAtThePosition = false;
+
+                while (!canBePlacedAtThePosition)
+                {
+                    _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+                    _randomPosToPlaceToken = new Vector3(Random.Range(-20, 20), 0, Random.Range(-20, 20));
+                    transform.position = _randomPosToPlaceToken;
+                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 3.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
+                    {
+                        if (!_raycastHit.collider.gameObject.GetComponent<Token>())
                         {
                             canBePlacedAtThePosition = true;
                             _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_PHYSICS);

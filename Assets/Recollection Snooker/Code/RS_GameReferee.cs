@@ -227,6 +227,120 @@ namespace MrSanmi.RecollectionSnooker
             }
         }
 
+        public void ActivateIsLoadedForAllCargoesOfTheSameType(CargoTypes cargoType)
+        {
+            switch (cargoType)
+            {
+                case CargoTypes.SCREW_PART:
+                    foreach(Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if(cargoLoaded.cargoType == CargoTypes.SCREW_PART)
+                        {
+                            cargoLoaded.IsLoaded = true;
+                            cargoLoaded.IsAvalaibleForFlicking = false;
+                        }
+                    }
+                    break;
+                case CargoTypes.CREW_MEMBER:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.CREW_MEMBER)
+                        {
+                            cargoLoaded.IsLoaded = true;
+                            cargoLoaded.IsAvalaibleForFlicking = false;
+                        }
+                    }
+                    break;
+                case CargoTypes.FUEL:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.FUEL)
+                        {
+                            cargoLoaded.IsLoaded = true;
+                            cargoLoaded.IsAvalaibleForFlicking = false;
+                        }
+                    }
+                    break;
+                case CargoTypes.MEDICINE:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.MEDICINE)
+                        {
+                            cargoLoaded.IsLoaded = true;
+                            cargoLoaded.IsAvalaibleForFlicking = false;
+                        }
+                    }
+                    break;
+                case CargoTypes.SUPPLIES:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.SUPPLIES)
+                        {
+                            cargoLoaded.IsLoaded = true;
+                            cargoLoaded.IsAvalaibleForFlicking = false;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        public void DeactivateIsLoadedForAllCargoesOfTheSameType(CargoTypes cargoType)
+        {
+            switch (cargoType)
+            {
+                case CargoTypes.SCREW_PART:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.SCREW_PART)
+                        {
+                            cargoLoaded.IsLoaded = false;
+                            cargoLoaded.IsAvalaibleForFlicking = true;
+                        }
+                    }
+                    break;
+                case CargoTypes.CREW_MEMBER:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.CREW_MEMBER)
+                        {
+                            cargoLoaded.IsLoaded = false;
+                            cargoLoaded.IsAvalaibleForFlicking = true;
+                        }
+                    }
+                    break;
+                case CargoTypes.FUEL:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.FUEL)
+                        {
+                            cargoLoaded.IsLoaded = false;
+                            cargoLoaded.IsAvalaibleForFlicking = true;
+                        }
+                    }
+                    break;
+                case CargoTypes.MEDICINE:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.MEDICINE)
+                        {
+                            cargoLoaded.IsLoaded = false;
+                            cargoLoaded.IsAvalaibleForFlicking = true;
+                        }
+                    }
+                    break;
+                case CargoTypes.SUPPLIES:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.SUPPLIES)
+                        {
+                            cargoLoaded.IsLoaded = false;
+                            cargoLoaded.IsAvalaibleForFlicking = true;
+                        }
+                    }
+                    break;
+            }
+        }
+
         #endregion
 
         #region RuntimeMethods
@@ -423,14 +537,28 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeChooseTokenByPlayerState()
         {
+            foreach(Cargo cargo in shipOfTheGame._cargoesLoaded)
+            {
+                cargo.gameObject.transform.position = cargo.gameObject.transform.position + new Vector3(0.0f, 0.0f + 4.0f, 0.0f); //This will be changed
+                cargo.StateMechanic(TokenStateMechanic.SET_RIGID);
+            }
+
             _nearestCargoToTheShip = shipOfTheGame.NearestCargo();
 
             _nearestCargoToTheShip.gameObject.SetActive(false);
 
             //All cargo is set to Spooky
-            foreach (Token cargo in allCargoOfTheGame)
+            for (int i = 0; i < allCargoOfTheGame.Length - 1; ++i)
             {
-                cargo.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+                if (allCargoOfTheGame[i].IsLoaded)
+                {
+                    allCargoOfTheGame[i].IsAvalaibleForFlicking = false;
+                }
+                else
+                {
+                    allCargoOfTheGame[i].StateMechanic(TokenStateMechanic.SET_SPOOKY);
+                }
+                
             }
             //TODO: Set Spooky for ships, monster parts and ship pivots
 
@@ -446,6 +574,8 @@ namespace MrSanmi.RecollectionSnooker
                     cargo.IsAvalaibleForFlicking = true;
                 }
             }
+
+            _nearestCargoToTheShip.IsAvalaibleForFlicking = false;
         }
 
         protected void ExecutingChooseTokenByPlayerState()
@@ -645,7 +775,6 @@ namespace MrSanmi.RecollectionSnooker
             foreach (Cargo cargo in allCargoOfTheGame)
             {
                 cargo.gameObject.SetActive(true);
-                _cargoToBeLoaded.StateMechanic(TokenStateMechanic.SET_PHYSICS);
             }
 
             _cargoToBeLoaded.gameObject.SetActive(true);

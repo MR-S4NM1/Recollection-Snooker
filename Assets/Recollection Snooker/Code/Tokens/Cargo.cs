@@ -71,7 +71,39 @@ namespace MrSanmi.RecollectionSnooker
             #endif
         }
 
+        private void OnCollisionStay(Collision other)
+        {
+            ValidateCollisionsByCargo(other);
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            if (other.gameObject.CompareTag("CargoSpace"))
+            {
+                print("I have been loaded!");
+                _gameReferee.ActivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
+            }
+        }
+
         private void OnCollisionEnter(Collision other)
+        {
+            ValidateCollisionsByCargo(other);
+            if (_isLoaded)
+            {
+                if (other.gameObject.CompareTag("Floor"))
+                {
+                    _gameReferee.DeactivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
+                }
+            }
+        }
+
+
+
+        #endregion
+
+        #region RuntimeMethods
+
+        protected void ValidateCollisionsByCargo(Collision other)
         {
             if (_gameReferee.GetGameState == RS_GameStates.CANNON_CARGO ||
                 _gameReferee.GetGameState == RS_GameStates.CANNON_BY_NAVIGATION)
@@ -83,33 +115,13 @@ namespace MrSanmi.RecollectionSnooker
             }
             else if (_gameReferee.GetGameState == RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER)
             {
-                if (other.gameObject.CompareTag("Ship"))
+                if (other.gameObject.CompareTag("CargoSpace"))
                 {
-                    _isLoaded = true;
+                    print("I have been loaded!");
+                    _gameReferee.ActivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
                 }
             }
         }
-
-        private void OnCollisionExit(Collision other)
-        {
-            if (_gameReferee.GetGameState == RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER ||
-                _gameReferee.GetGameState == RS_GameStates.CANNON_BY_NAVIGATION ||
-                _gameReferee.GetGameState == RS_GameStates.CANNON_CARGO)
-            {
-                if (other.gameObject.CompareTag("Ship"))
-                {
-                    _isLoaded = false;
-                }
-            }
-        }
-
-
-
-        #endregion
-
-        #region RuntimeMethods
-
-
 
 
         #endregion
@@ -123,6 +135,7 @@ namespace MrSanmi.RecollectionSnooker
         public bool IsLoaded
         {
             get { return _isLoaded; }
+            set { _isLoaded = value; }
         }
 
         #endregion

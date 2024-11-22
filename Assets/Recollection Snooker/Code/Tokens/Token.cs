@@ -47,7 +47,7 @@ namespace MrSanmi.RecollectionSnooker
         [SerializeField] protected GameplayAttributes _gameplayAttributes;
         protected Transform _flagTransform;
         protected Flag _contactedFlag;
-        protected bool _cargoOrShipPivotHaveTouchedAMonsterPart;
+        protected bool _cargoOrShipPivotHasTouchedAMonsterPart;
         protected bool _shipPivotHasTouchedACargo;
 
         #endregion
@@ -195,7 +195,7 @@ namespace MrSanmi.RecollectionSnooker
             }
             ValidateReferences();
 
-            _cargoOrShipPivotHaveTouchedAMonsterPart = false;
+            _cargoOrShipPivotHasTouchedAMonsterPart = false;
         }
 
         #endregion
@@ -235,7 +235,7 @@ namespace MrSanmi.RecollectionSnooker
 
         public bool GetCargoOrShipPivotHaveTouchedAMonsterPart
         {
-            get { return _cargoOrShipPivotHaveTouchedAMonsterPart; }
+            get { return _cargoOrShipPivotHasTouchedAMonsterPart; }
         }
 
         #endregion
