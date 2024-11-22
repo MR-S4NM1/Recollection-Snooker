@@ -78,23 +78,28 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnTriggerStay(Collider other)
         {
-            if (other.gameObject.CompareTag("CargoSpace"))
+            switch (_gameReferee.GetGameState)
             {
-                print("I have been loaded!");
-                _gameReferee.ActivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
+                case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
+                    ValidateCargoHasBeenLoaded(other);
+                    break;
             }
+            
         }
 
         private void OnCollisionEnter(Collision other)
         {
-            ValidateCollisionsByCargo(other);
-            if (_isLoaded)
+            switch (_gameReferee.GetGameState)
             {
-                if (other.gameObject.CompareTag("Floor"))
-                {
-                    _gameReferee.DeactivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
-                }
+                case RS_GameStates.CANNON_CARGO:
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateCollisionsByCargo(other);
+                    break;
+                case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
+                    ValidateCollisionsByLoadingCargo(other);
+                    break;
             }
+            
         }
 
 
@@ -105,21 +110,34 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void ValidateCollisionsByCargo(Collision other)
         {
-            if (_gameReferee.GetGameState == RS_GameStates.CANNON_CARGO ||
-                _gameReferee.GetGameState == RS_GameStates.CANNON_BY_NAVIGATION)
+            if (other.gameObject.CompareTag("Ship") && !_isLoaded)
             {
-                if (other.gameObject.CompareTag("Ship") && !_isLoaded)
+                _gameReferee.CargoToBeLoaded = this;
+            }
+            if (_isLoaded)
+            {
+                if (other.gameObject.CompareTag("Floor"))
                 {
-                    _gameReferee.CargoToBeLoaded = this;
+                    _gameReferee.DeactivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
                 }
             }
-            else if (_gameReferee.GetGameState == RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER)
+        }
+
+        protected void ValidateCollisionsByLoadingCargo(Collision other)
+        {
+            if (other.gameObject.CompareTag("CargoSpace"))
             {
-                if (other.gameObject.CompareTag("CargoSpace"))
-                {
-                    print("I have been loaded!");
-                    _gameReferee.ActivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
-                }
+                print("I have been loaded!");
+                _gameReferee.ActivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
+            }
+        }
+
+        protected void ValidateCargoHasBeenLoaded(Collider other)
+        {
+            if (other.gameObject.CompareTag("CargoSpace"))
+            {
+                print("I have been loaded!");
+                _gameReferee.ActivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
             }
         }
 
