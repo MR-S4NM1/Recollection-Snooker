@@ -95,14 +95,13 @@ namespace MrSanmi.RecollectionSnooker
                 while (!canBePlacedAtThePosition)
                 {
                     _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
-                    _randomPosToPlaceToken = new Vector3(Random.Range(-20, 20), 0, Random.Range(-20, 20));
-                    transform.position = _randomPosToPlaceToken;
-                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 10.0f, _randomPosToPlaceToken.z), 5.0f, -transform.up * 1.0f, out _raycastHit, 10.0f))
+                    _randomPosToPlaceToken = new Vector3(Random.Range(-25, 25), 0, Random.Range(-25, 25));
+                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 10.0f, _randomPosToPlaceToken.z), 4.0f, -transform.up * 1.0f, out _raycastHit, 10.0f))
                     {
                         if (!_raycastHit.collider.gameObject.GetComponent<Token>())
                         {
                             canBePlacedAtThePosition = true;
-                            _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_RIGID);
+                            _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_PHYSICS);
                             transform.position = _randomPosToPlaceToken;
                         }
                     }
@@ -116,9 +115,8 @@ namespace MrSanmi.RecollectionSnooker
                 while (!canBePlacedAtThePosition)
                 {
                     _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
-                    _randomPosToPlaceToken = new Vector3(Random.Range(-20, 20), 0, Random.Range(-20, 20));
-                    transform.position = _randomPosToPlaceToken;
-                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 3.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
+                    _randomPosToPlaceToken = new Vector3(Random.Range(-25, 25), 0, Random.Range(-25, 25));
+                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 6.0f, _randomPosToPlaceToken.z), 4.0f, -transform.up * 1.0f, out _raycastHit, 6.0f))
                     {
                         if (!_raycastHit.collider.gameObject.GetComponent<Token>())
                         {

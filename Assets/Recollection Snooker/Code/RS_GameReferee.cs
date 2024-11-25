@@ -42,13 +42,14 @@ namespace MrSanmi.RecollectionSnooker
         [Header("Token References")]
         [SerializeField] protected Cargo[] allCargoOfTheGame;
         [SerializeField] protected MonsterPart[] allMonsterPartOfTheGame;
-        [SerializeField] protected Ship shipOfTheGame;
+        [SerializeField] public Ship shipOfTheGame;
         [SerializeField] protected ShipPivot shipPivotsOfTheGame;
         [SerializeField] protected MonsterPart monsterHead;
 
         [Header("Camera References")]
         [SerializeField] protected CinemachineFreeLook tableFreeLookCamera;
         [SerializeField] protected CinemachineVirtualCamera shipVirtualCamera;
+        [SerializeField] protected CinemachineVirtualCamera islandVirtualCamera;
 
         [Header("Flags")]
         [SerializeField] protected GameObject flag;
@@ -71,10 +72,12 @@ namespace MrSanmi.RecollectionSnooker
         [SerializeField] protected bool _isAllCargoStill;
         protected int _randomTokenPos;
         protected Cargo _nearestCargoToTheShip;
-        protected bool _gameRefereeHasConfirmedThatACargoOrShipPivotHaveTouchedAMonsterPart;
+        protected bool _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart;
         [SerializeField] protected Cargo _cargoToBeLoaded;
         protected bool _aCargoHasTouchedTheShip;
         protected Vector3 _originalPositionOfTheFlag;
+        protected bool _shipPivotHasTouchedTheIsland;
+
 
         #endregion
 
@@ -495,7 +498,7 @@ namespace MrSanmi.RecollectionSnooker
         {
             _originalPositionOfTheFlag = flag.transform.localPosition;
             _aCargoHasTouchedTheShip = false;
-            _gameRefereeHasConfirmedThatACargoOrShipPivotHaveTouchedAMonsterPart = false;
+            _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
 
             //TODO: Make the proper initialization of the state
 
@@ -539,8 +542,8 @@ namespace MrSanmi.RecollectionSnooker
         {
             foreach(Cargo cargo in shipOfTheGame._cargoesLoaded)
             {
-                cargo.gameObject.transform.position = cargo.gameObject.transform.position + new Vector3(0.0f, 0.0f + 4.0f, 0.0f); //This will be changed
-                cargo.StateMechanic(TokenStateMechanic.SET_RIGID);
+                cargo.gameObject.transform.position = shipOfTheGame.gameObject.transform.position + new Vector3(0.0f, 0.0f + 3.0f, 0.0f);
+                cargo.StateMechanic(TokenStateMechanic.SET_SPOOKY);
             }
 
             _nearestCargoToTheShip = shipOfTheGame.NearestCargo();
@@ -645,12 +648,36 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeCannonByNavigationState()
         {
+            _nearestCargoToTheShip?.gameObject.SetActive(true);
+            _nearestCargoToTheShip = null;
+            _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
 
+            foreach (Cargo cargo in allCargoOfTheGame)
+            {
+                cargo.StateMechanic(TokenStateMechanic.SET_PHYSICS);
+            }
         }
 
         protected void ExecutingCannonByNavigationState()
         {
-
+            if (IsAllCargoStill())
+            {
+                if (_gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart)
+                {
+                    GameStateMechanic(RS_GameStates.MOVE_COUNTER_BY_SANCTION);
+                }
+                else
+                {
+                    if (_shipPivotHasTouchedTheIsland && (_cargoToBeLoaded != null && !shipOfTheGame._cargoesLoaded.Contains(_cargoToBeLoaded)))
+                    {
+                        GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
+                    }
+                    else
+                    {
+                        GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+                    }
+                }
+            }
         }
 
         protected void FinalizeCannonByNavigationState()
@@ -704,7 +731,7 @@ namespace MrSanmi.RecollectionSnooker
         {
             _nearestCargoToTheShip?.gameObject.SetActive(true);
             _nearestCargoToTheShip = null;
-            _gameRefereeHasConfirmedThatACargoOrShipPivotHaveTouchedAMonsterPart = false;
+            _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
 
             foreach (Cargo cargo in allCargoOfTheGame)
             {
@@ -716,13 +743,13 @@ namespace MrSanmi.RecollectionSnooker
         {
             if (IsAllCargoStill())
             {
-                if (_gameRefereeHasConfirmedThatACargoOrShipPivotHaveTouchedAMonsterPart)
+                if (_gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart)
                 {
                     GameStateMechanic(RS_GameStates.MOVE_COUNTER_BY_SANCTION);
                 }
                 else
                 {
-                    if ((_aCargoHasTouchedTheShip) && (_cargoToBeLoaded != null))
+                    if (_aCargoHasTouchedTheShip && (_cargoToBeLoaded != null && !shipOfTheGame._cargoesLoaded.Contains(_cargoToBeLoaded)))
                     {
                         GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
                     }
@@ -731,11 +758,6 @@ namespace MrSanmi.RecollectionSnooker
                         GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
                     }
                 }
-
-                //TODO: Pending validation events while the cannon was executing
-                //A) LOAD_CARGO_BY_PLAYER
-                //B) MOVE_COUNTER
-                //C) FINALIZE_TURN (Respawn of the monster parts)
             }
         }
 
@@ -753,16 +775,26 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeLoadingAndOrganizingCargoByPlayerState()
         {
-            ChangeCameraTo(shipVirtualCamera);
-
-            foreach(Cargo cargo in allCargoOfTheGame)
+            if (_aCargoHasTouchedTheShip)
             {
-                if(cargo != _cargoToBeLoaded)
+                ChangeCameraTo(shipVirtualCamera);
+
+                foreach (Cargo cargo in allCargoOfTheGame)
                 {
-                    cargo.gameObject.SetActive(false);
+                    if (cargo != _cargoToBeLoaded && !cargo.IsLoaded)
+                    {
+                        cargo.gameObject.SetActive(false);
+                    }
                 }
+
+                _cargoToBeLoaded.StateMechanic(TokenStateMechanic.SET_SPOOKY);
             }
-            _cargoToBeLoaded.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+            else if (_shipPivotHasTouchedTheIsland)
+            {
+                ChangeCameraTo(islandVirtualCamera);
+
+
+            }
         }
 
         protected void ExecutingLoadingAndOrganizingCargoByPlayerState()
@@ -789,7 +821,7 @@ namespace MrSanmi.RecollectionSnooker
         protected void InitializeMoveCounterBySanctionState()
         {
             healthPoints -= 1;
-            print(healthPoints);
+            print("You lose a life");
             GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
         }
 
@@ -891,7 +923,12 @@ namespace MrSanmi.RecollectionSnooker
 
         public bool SetGameRefereeHasConfirmedThatNoCargoOrShipPivotHaveTouchedAMonsterPart
         {
-            set { _gameRefereeHasConfirmedThatACargoOrShipPivotHaveTouchedAMonsterPart = value; }
+            set { _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = value; }
+        }
+
+        public bool SetShipPivotHasTouchedTheIsland
+        {
+            set { _shipPivotHasTouchedTheIsland = value; }
         }
 
         public Cargo CargoToBeLoaded

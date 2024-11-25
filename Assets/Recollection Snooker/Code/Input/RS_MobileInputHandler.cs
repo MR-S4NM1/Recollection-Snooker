@@ -170,7 +170,6 @@ namespace MrSanmi.RecollectionSnooker
                 if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),
                     out _raycastHit, 50.0f, LayerMask.GetMask("CargoSpace")))
                 {
-                    print("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
                     _goTouchCursor.SetActive(true);
                     _goTouchCursor.transform.position = _raycastHit.point;
                     _gameReferee.CargoToBeLoaded.gameObject.transform.position = Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,

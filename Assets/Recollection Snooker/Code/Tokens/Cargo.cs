@@ -99,7 +99,6 @@ namespace MrSanmi.RecollectionSnooker
                     ValidateCollisionsByLoadingCargo(other);
                     break;
             }
-            
         }
 
 
@@ -125,7 +124,7 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void ValidateCollisionsByLoadingCargo(Collision other)
         {
-            if (other.gameObject.CompareTag("CargoSpace"))
+            if (other.gameObject.CompareTag("CargoSpace") && !_isLoaded)
             {
                 print("I have been loaded!");
                 _gameReferee.ActivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
@@ -134,10 +133,22 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void ValidateCargoHasBeenLoaded(Collider other)
         {
+            if (_isLoaded) //If it's loaded, DON'T LOAD IT!
+            {
+                return;
+            }
+
             if (other.gameObject.CompareTag("CargoSpace"))
             {
                 print("I have been loaded!");
-                _gameReferee.ActivateIsLoadedForAllCargoesOfTheSameType(this.cargoType);
+                _isLoaded = true; //Set cargo as loaded
+                _gameReferee.ActivateIsLoadedForAllCargoesOfTheSameType(this.cargoType); // Sincroniza con el árbitro.
+
+                //Add cargo to the list
+                if (!_gameReferee.shipOfTheGame._cargoesLoaded.Contains(this))
+                {
+                    _gameReferee.shipOfTheGame._cargoesLoaded.Add(this);
+                }
             }
         }
 

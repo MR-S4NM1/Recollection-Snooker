@@ -61,23 +61,43 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnCollisionEnter(Collision other)
         {
-            _gameReferee.DebugInMobile(gameObject.name + 
-                " OnCollisionEnter() - Detected collision with " + 
-                other.gameObject.name);
-            ValidateCollisionDuringCannon(other);
+            //_gameReferee.DebugInMobile(gameObject.name + 
+            //    " OnCollisionEnter() - Detected collision with " + 
+            //    other.gameObject.name);
+            switch (_gameReferee.GetGameState)
+            {
+                case RS_GameStates.CANNON_CARGO:
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateCollisionDuringCannon(other);
+                    break;
+            }
         }
 
         private void OnCollisionStay(Collision other)
         {
-            ValidateCollisionDuringCannon(other);
+            switch (_gameReferee.GetGameState)
+            {
+                case RS_GameStates.CANNON_CARGO:
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateCollisionDuringCannon(other);
+                    break;
+            }
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            _gameReferee.DebugInMobile(gameObject.name +
-                " OnTriggerEnter() - Detected collision with " + 
-                other.gameObject.name);
+            //_gameReferee.DebugInMobile(gameObject.name +
+            //    " OnTriggerEnter() - Detected collision with " + 
+            //    other.gameObject.name);
             ValidateTrigger(other);
+
+            switch (_gameReferee.GetGameState)
+            {
+                case RS_GameStates.CANNON_CARGO:
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateTriggerDuringCannon(other);
+                    break;
+            }
         }
 
         //void UpdateInEditor()
@@ -115,16 +135,24 @@ namespace MrSanmi.RecollectionSnooker
 
         public virtual void ValidateCollisionDuringCannon(Collision other)
         {
-            if (_gameReferee.GetGameState == RS_GameStates.CANNON_CARGO ||
-            _gameReferee.GetGameState == RS_GameStates.CANNON_BY_NAVIGATION)
+            if (this as ShipPivot || this as Cargo)
             {
-                if (this as ShipPivot || this as Cargo)
+                if (other.gameObject.CompareTag("MonsterLimb"))
                 {
-                    if (other.gameObject.CompareTag("MonsterLimb"))
-                    {
-                        print("You lose a life");
-                        _gameReferee.SetGameRefereeHasConfirmedThatNoCargoOrShipPivotHaveTouchedAMonsterPart = true;
-                    }
+                    print("You lose a life");
+                    _gameReferee.SetGameRefereeHasConfirmedThatNoCargoOrShipPivotHaveTouchedAMonsterPart = true;
+                }
+            }
+        }
+
+        public virtual void ValidateTriggerDuringCannon(Collider other)
+        {
+            if (this as ShipPivot || this as Cargo)
+            {
+                if (other.gameObject.CompareTag("MonsterLimb"))
+                {
+                    print("You lose a life");
+                    _gameReferee.SetGameRefereeHasConfirmedThatNoCargoOrShipPivotHaveTouchedAMonsterPart = true;
                 }
             }
         }

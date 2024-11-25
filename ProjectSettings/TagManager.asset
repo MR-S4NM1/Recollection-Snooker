@@ -10,6 +10,7 @@ TagManager:
   - Ship
   - CargoSpace
   - Floor
+  - ShipPivot
   layers:
   - Default
   - TransparentFX

@@ -66,62 +66,38 @@ namespace MrSanmi.RecollectionSnooker
             #endif
         }
 
-        //private void OnCollisionEnter(Collision other)
-        //{
-        //    ValidateCollisionCargo(other);
-        //}
-
-        //private void OnCollisionStay(Collision other)
-        //{
-        //    ValidateCollisionCargo(other);
-        //}
-
         private void OnTriggerEnter(Collider other)
         {
-            ValidateTriggerCargo(other);
+            switch(_gameReferee.GetGameState)
+            {
+                case RS_GameStates.CANNON_CARGO:
+                    ValidateShipHasTouchedACargoDuringCannon(other);
+                    break;
+                case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
+                    ValidateTriggerCargoDuringLoadingCargo(other);
+                    break;
+            }
         }
 
         #endregion
 
         #region RuntimeMethods
 
-        //void ValidateCollisionCargo(Collision other)
-        //{
-        //    if (other.collider.CompareTag("Cargo"))
-        //    {
-        //        switch (_gameReferee.GetGameState)
-        //        {
-        //            case RS_GameStates.CANNON_CARGO:
-        //                _gameReferee.SetACargoHasTouchedTheShip = true;
-        //                break;
-        //            case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
-        //            case RS_GameStates.SHIFT_MONSTER_PARTS:
-        //                if ((!other.gameObject.GetComponent<Cargo>().IsLoaded) && (other.gameObject.name == _gameReferee._lastCargoLoaded))
-        //                {
-        //                    _cargoesLoaded.Add(other.gameObject.GetComponent<Cargo>());
-        //                }
-        //                break;
-        //        }
-        //    }
-        //}
-
-        void ValidateTriggerCargo(Collider other)
+        void ValidateTriggerCargoDuringLoadingCargo(Collider other)
         {
-            if (other.CompareTag("Cargo"))
+            if (other.CompareTag("Cargo") && (!other.gameObject.GetComponent<Cargo>().IsLoaded) &&
+                (!_cargoesLoaded.Contains(other.gameObject.GetComponent<Cargo>())))
             {
-                switch (_gameReferee.GetGameState)
-                {
-                    case RS_GameStates.CANNON_CARGO:
-                        _gameReferee.SetACargoHasTouchedTheShip = true;
-                        break;
-                    case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
-                        if ((!other.gameObject.GetComponent<Cargo>().IsLoaded) &&
-                            !_cargoesLoaded.Contains(other.gameObject.GetComponent<Cargo>()))
-                        {
-                            _cargoesLoaded.Add(other.gameObject.GetComponent<Cargo>());
-                        }
-                        break;
-                }
+                _cargoesLoaded.Add(other.gameObject.GetComponent<Cargo>());
+            }
+        }
+
+        void ValidateShipHasTouchedACargoDuringCannon(Collider other)
+        {
+            if (other.CompareTag("Cargo") && !other.gameObject.GetComponent<Cargo>().IsLoaded &&
+                (!_cargoesLoaded.Contains(other.gameObject.GetComponent<Cargo>())))
+            {
+                _gameReferee.SetACargoHasTouchedTheShip = true;
             }
         }
 
@@ -133,7 +109,7 @@ namespace MrSanmi.RecollectionSnooker
         public Cargo NearestCargo()
         {
             //_cargosPos.Clear(); //start with a clean slate
-            _nearestDistance = 1000000000000000; //Mathf.Infinity;
+            _nearestDistance = Mathf.Infinity;
 
             //We calculate the distance between all cargo and the ship.
             for (int i = 0; i < _cargos.Length - 1; ++i)
