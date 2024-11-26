@@ -54,6 +54,7 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnTriggerEnter(Collider other)
         {
+            OnTriggerEvent(other);
             switch (_gameReferee.GetGameState)
             {
                 case RS_GameStates.CANNON_BY_NAVIGATION:

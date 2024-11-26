@@ -81,6 +81,9 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnTriggerEnter(Collider other)
         {
+            //base.OnTriggerEnterEvent(other);
+            OnTriggerEvent(other);
+            //Validation exclusively for the CARGO
             switch (_gameReferee.GetGameState)
             {
                 case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
@@ -94,7 +97,6 @@ namespace MrSanmi.RecollectionSnooker
                     }
                     break;
             }
-            
         }
 
         private void OnCollisionEnter(Collision other)
@@ -160,6 +162,7 @@ namespace MrSanmi.RecollectionSnooker
             if (other.gameObject.CompareTag("CargoSpace"))
             {
                 _isLoadedOnTheShip = true; //Set cargo as loaded
+                _gameplayAttributes.isAvailableForFlicking = false;
                 _gameReferee.ActivateIsLoadedOnTheShipForAllCargoesOfTheSameType(this.cargoType);
 
                 //Add cargo to the list
@@ -183,7 +186,7 @@ namespace MrSanmi.RecollectionSnooker
 
                 _isLoadedOnTheShip = false;
                 _isLoadedOnTheIsland = true;
-
+                _gameplayAttributes.isAvailableForFlicking = false;
                 _gameReferee.ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(this.cargoType);
                 _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Remove(this);
 

@@ -86,18 +86,7 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnTriggerEnter(Collider other)
         {
-            _gameReferee.DebugInMobile(gameObject.name +
-                " OnTriggerEnter() - Detected collision with " +
-                other.gameObject.name);
-            ValidateTrigger(other);
-
-            switch (_gameReferee.GetGameState)
-            {
-                case RS_GameStates.CANNON_CARGO:
-                case RS_GameStates.CANNON_BY_NAVIGATION:
-                    ValidateTriggerDuringCannon(other);
-                    break;
-            }
+            OnTriggerEvent(other);
         }
 
         //void UpdateInEditor()
@@ -111,6 +100,14 @@ namespace MrSanmi.RecollectionSnooker
         #endregion
 
         #region RuntimeMethods
+
+        protected void OnTriggerEvent(Collider other)
+        {
+            _gameReferee.DebugInMobile(gameObject.name +
+                " OnTriggerEnter() - Detected collision with " +
+                other.gameObject.name);
+            ValidateTrigger(other);
+        }
 
         protected virtual void ValidateReferences()
         {
@@ -158,11 +155,16 @@ namespace MrSanmi.RecollectionSnooker
         protected virtual void ValidateTrigger(Collider other)
         {
             _gameReferee.DebugInMobile(" Validate Collision " + other.gameObject.name);
+            //cases for every type of TOKEN
             switch (_gameReferee.GetGameState)
             { 
                 case RS_GameStates.FLICK_TOKEN_BY_PLAYER:
                     _gameReferee.DebugInMobile("FLICK_TOKEN_BY_PLAYER " + other.gameObject.name);
                     ValidateTriggerWithFlag(other);
+                    break;
+                case RS_GameStates.CANNON_CARGO:
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateTriggerDuringCannon(other);
                     break;
             }
         }
@@ -193,7 +195,7 @@ namespace MrSanmi.RecollectionSnooker
                     //to obtain the point of contact
                     //other.contacts[0].point it gives us the specefic point of contact
                     _tokenPhysicalFSM.ThrowTokenAtSpecificPosition(
-                        _flagTransformValues.forward * (Mathf.Abs(_contactedFlag.DeltaXDegrees) + 1f),
+                        _flagTransformValues.forward * (Mathf.Abs(_contactedFlag.DeltaXDegrees) + 1f * 5.0f),
                         other.gameObject.transform.position
                         ); // other.contacts[0].point);
 

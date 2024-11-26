@@ -36,15 +36,10 @@ namespace MrSanmi.RecollectionSnooker
             base.InitializeToken();
         }
 
-        void Update()
+        private void OnTriggerEnter(Collider other)
         {
-
+            OnTriggerEvent(other);
         }
-
-        //private void OnCollisionEnter(Collision other)
-        //{
-        //    ValidateCollision(other);
-        //}
 
         private void OnDrawGizmos()
         {

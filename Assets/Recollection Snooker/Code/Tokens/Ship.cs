@@ -68,7 +68,8 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnTriggerEnter(Collider other)
         {
-            switch(_gameReferee.GetGameState)
+            OnTriggerEvent(other);
+            switch (_gameReferee.GetGameState)
             {
                 case RS_GameStates.CANNON_CARGO:
                     ValidateShipHasTouchedACargoDuringCannon(other);

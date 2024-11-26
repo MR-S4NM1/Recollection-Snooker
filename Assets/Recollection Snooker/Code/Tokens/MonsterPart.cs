@@ -78,6 +78,11 @@ namespace MrSanmi.RecollectionSnooker
             }
         }
 
+        private void OnTriggerEnter(Collider other)
+        {
+            OnTriggerEvent(other);
+        }
+
         #endregion
 
         #region RuntimeMethods
