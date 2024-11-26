@@ -53,28 +53,9 @@ namespace MrSanmi.RecollectionSnooker
             #endif
         }
 
-        private void OnCollisionEnter(Collision other)
-        {
-            switch (_gameReferee.GetGameState)
-            {
-                case RS_GameStates.CANNON_BY_NAVIGATION:
-                    ValidateCollisionDuringCannonByNavigation(other);
-                    break;
-            }
-        }
-
         #endregion
 
         #region RuntimeMethods
-
-        protected void ValidateCollisionDuringCannonByNavigation(Collision other)
-        {
-            if (other.gameObject.CompareTag("Island"))
-            {
-                _gameReferee.SetShipPivotHasTouchedTheIsland = true;
-            }
-        }
-
 
         #endregion
 

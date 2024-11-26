@@ -13,15 +13,14 @@ namespace MrSanmi.RecollectionSnooker
         [SerializeField] protected GameObject _goTouchCursor;
         [SerializeField] protected Camera _camera;
         [SerializeField] protected RS_GameReferee _gameReferee;
-        [SerializeField] protected LayerMask _layerMaskOfTheToken;
 
         #endregion
 
         #region RuntimeVariables
 
         protected RaycastHit _raycastHit;
-        protected Token _chosenToken;
-        protected Token _contactToken;
+        [SerializeField] protected Token _chosenToken;
+        [SerializeField] protected Token _contactToken;
 
         #endregion
 
@@ -103,14 +102,8 @@ namespace MrSanmi.RecollectionSnooker
         {
             if (value.performed)
             {
-                if (
-                    Physics.Raycast(
-                        _camera.ScreenPointToRay(value.ReadValue<Vector2>()),
-                        out _raycastHit,
-                        50.0f,
-                        LayerMask.GetMask("Token")
-                        )
-                    )
+                if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),out _raycastHit,
+                        100.0f, LayerMask.GetMask("Token")))
                 {
                     _chosenToken = _raycastHit.collider.gameObject.GetComponent<Token>();
                     if (_chosenToken.IsAvalaibleForFlicking) {
@@ -141,7 +134,7 @@ namespace MrSanmi.RecollectionSnooker
                     Physics.Raycast(
                         _camera.ScreenPointToRay(value.ReadValue<Vector2>()),
                         out _raycastHit,
-                        50.0f,
+                        100.0f,
                         LayerMask.GetMask("Token")
                         )
                     )
@@ -167,17 +160,40 @@ namespace MrSanmi.RecollectionSnooker
         {
             if (value.performed)
             {
-                if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),
-                    out _raycastHit, 50.0f, LayerMask.GetMask("CargoSpace")))
+                if (_gameReferee._aCargoHasTouchedTheShip)
                 {
-                    _goTouchCursor.SetActive(true);
-                    _goTouchCursor.transform.position = _raycastHit.point;
-                    _gameReferee.CargoToBeLoaded.gameObject.transform.position = Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,
-                        _raycastHit.point, 0.5f);
+                    if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),
+                    out _raycastHit, 100.0f, LayerMask.GetMask("CargoSpace")))
+                    {
+                        _goTouchCursor.SetActive(true);
+                        _goTouchCursor.transform.position = _raycastHit.point;
+                        _gameReferee.CargoToBeLoaded.gameObject.transform.position = Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,
+                            _raycastHit.point, 0.5f);
+                    }
+                    else
+                    {
+                        _goTouchCursor.SetActive(false);
+                    }
                 }
-                else
+                else if (_gameReferee._shipPivotHasTouchedTheIsland)
                 {
-                    _goTouchCursor.SetActive(false);
+                    if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),
+                        out _raycastHit, 100.0f, LayerMask.GetMask("IslandCargoSpace")))
+                    {
+                        _goTouchCursor.SetActive(true);
+                        _goTouchCursor.transform.position = _raycastHit.point;
+
+                        for (int i = 0; i < _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count; ++i)
+                        {
+                            _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip[i].gameObject.transform.position = 
+                                Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,
+                                _raycastHit.point, 0.5f);
+                        }
+                    }
+                    else
+                    {
+                        _goTouchCursor.SetActive(false);
+                    }
                 }
             }
             else if (value.canceled)

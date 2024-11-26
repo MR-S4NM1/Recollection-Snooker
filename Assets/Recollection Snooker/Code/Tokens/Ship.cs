@@ -29,7 +29,7 @@ namespace MrSanmi.RecollectionSnooker
         #region RuntimeVariables
 
         [SerializeField] protected Cargo[] _cargos;
-        [SerializeField] public List<Cargo> _cargoesLoaded;
+        [SerializeField] public List<Cargo> _cargoesLoadedOnTheShip;
         //List<float> _cargosPos; //classes are normally instanciated at the Start / Awake method
         Cargo _nearestCargo;
         float _nearestDistance;
@@ -43,7 +43,7 @@ namespace MrSanmi.RecollectionSnooker
         void Start()
         {
             base.InitializeToken();
-            _cargoesLoaded = new List<Cargo>();
+            _cargoesLoadedOnTheShip = new List<Cargo>();
             //We obtain all cargo in scene in order to know which one is the nearest, and then save them in an array.
             _cargos = GameObject.FindObjectsOfType<Cargo>(true);
             //_cargosPos = new List<float>();  //runtime variable
@@ -85,19 +85,19 @@ namespace MrSanmi.RecollectionSnooker
 
         void ValidateTriggerCargoDuringLoadingCargo(Collider other)
         {
-            if (other.CompareTag("Cargo") && (!other.gameObject.GetComponent<Cargo>().IsLoaded) &&
-                (!_cargoesLoaded.Contains(other.gameObject.GetComponent<Cargo>())))
+            if (other.CompareTag("Cargo") && (!other.gameObject.GetComponent<Cargo>().IsLoadedOnTheShip) &&
+                (!_cargoesLoadedOnTheShip.Contains(other.gameObject.GetComponent<Cargo>())))
             {
-                _cargoesLoaded.Add(other.gameObject.GetComponent<Cargo>());
+                _cargoesLoadedOnTheShip.Add(other.gameObject.GetComponent<Cargo>());
             }
         }
 
         void ValidateShipHasTouchedACargoDuringCannon(Collider other)
         {
-            if (other.CompareTag("Cargo") && !other.gameObject.GetComponent<Cargo>().IsLoaded &&
-                (!_cargoesLoaded.Contains(other.gameObject.GetComponent<Cargo>())))
+            if (other.CompareTag("Cargo") && !other.gameObject.GetComponent<Cargo>().IsLoadedOnTheShip &&
+                (!_cargoesLoadedOnTheShip.Contains(other.gameObject.GetComponent<Cargo>())))
             {
-                _gameReferee.SetACargoHasTouchedTheShip = true;
+                _gameReferee._aCargoHasTouchedTheShip = true;
             }
         }
 
@@ -114,7 +114,7 @@ namespace MrSanmi.RecollectionSnooker
             //We calculate the distance between all cargo and the ship.
             for (int i = 0; i < _cargos.Length - 1; ++i)
             {
-                if (!_cargos[i].IsLoaded)
+                if (!_cargos[i].IsLoadedOnTheShip)
                 {
                     _currentDistance = Vector3.SqrMagnitude(this.gameObject.transform.position - _cargos[i].gameObject.transform.position);
                     //_cargosPos.Add(_currentDistance);

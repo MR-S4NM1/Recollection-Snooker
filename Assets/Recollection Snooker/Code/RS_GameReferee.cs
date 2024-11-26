@@ -43,8 +43,11 @@ namespace MrSanmi.RecollectionSnooker
         [SerializeField] protected Cargo[] allCargoOfTheGame;
         [SerializeField] protected MonsterPart[] allMonsterPartOfTheGame;
         [SerializeField] public Ship shipOfTheGame;
-        [SerializeField] protected ShipPivot shipPivotsOfTheGame;
+        [SerializeField] protected ShipPivot shipPivotOfTheGame;
         [SerializeField] protected MonsterPart monsterHead;
+        [SerializeField] public Island islandOfTheGame;
+        [SerializeField] protected Transform[] cargoPositionsOnShip;
+        [SerializeField] protected Transform[] cargoPositionsOnIsland;
 
         [Header("Camera References")]
         [SerializeField] protected CinemachineFreeLook tableFreeLookCamera;
@@ -74,9 +77,9 @@ namespace MrSanmi.RecollectionSnooker
         protected Cargo _nearestCargoToTheShip;
         protected bool _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart;
         [SerializeField] protected Cargo _cargoToBeLoaded;
-        protected bool _aCargoHasTouchedTheShip;
+        public bool _aCargoHasTouchedTheShip;
         protected Vector3 _originalPositionOfTheFlag;
-        protected bool _shipPivotHasTouchedTheIsland;
+        public bool _shipPivotHasTouchedTheIsland;
 
 
         #endregion
@@ -195,7 +198,8 @@ namespace MrSanmi.RecollectionSnooker
                     }
                     break;
                 case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
-                    if (_gameState == RS_GameStates.CANNON_CARGO)
+                    if (_gameState == RS_GameStates.CANNON_CARGO ||
+                        _gameState == RS_GameStates.CANNON_BY_NAVIGATION)
                     {
                         FinalizeCurrentState(toNextState);
                     }
@@ -230,7 +234,8 @@ namespace MrSanmi.RecollectionSnooker
             }
         }
 
-        public void ActivateIsLoadedForAllCargoesOfTheSameType(CargoTypes cargoType)
+        //Ship
+        public void ActivateIsLoadedOnTheShipForAllCargoesOfTheSameType(CargoTypes cargoType)
         {
             switch (cargoType)
             {
@@ -239,7 +244,7 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if(cargoLoaded.cargoType == CargoTypes.SCREW_PART)
                         {
-                            cargoLoaded.IsLoaded = true;
+                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -249,7 +254,7 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.CREW_MEMBER)
                         {
-                            cargoLoaded.IsLoaded = true;
+                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -259,7 +264,7 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.FUEL)
                         {
-                            cargoLoaded.IsLoaded = true;
+                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -269,7 +274,7 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.MEDICINE)
                         {
-                            cargoLoaded.IsLoaded = true;
+                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -279,7 +284,7 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.SUPPLIES)
                         {
-                            cargoLoaded.IsLoaded = true;
+                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -287,7 +292,7 @@ namespace MrSanmi.RecollectionSnooker
             }
         }
 
-        public void DeactivateIsLoadedForAllCargoesOfTheSameType(CargoTypes cargoType)
+        public void DeactivateIsLoadedOnTheShipForAllCargoesOfTheSameType(CargoTypes cargoType)
         {
             switch (cargoType)
             {
@@ -296,7 +301,7 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.SCREW_PART)
                         {
-                            cargoLoaded.IsLoaded = false;
+                            cargoLoaded.IsLoadedOnTheShip = false;
                             cargoLoaded.IsAvalaibleForFlicking = true;
                         }
                     }
@@ -306,7 +311,7 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.CREW_MEMBER)
                         {
-                            cargoLoaded.IsLoaded = false;
+                            cargoLoaded.IsLoadedOnTheShip = false;
                             cargoLoaded.IsAvalaibleForFlicking = true;
                         }
                     }
@@ -316,7 +321,7 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.FUEL)
                         {
-                            cargoLoaded.IsLoaded = false;
+                            cargoLoaded.IsLoadedOnTheShip = false;
                             cargoLoaded.IsAvalaibleForFlicking = true;
                         }
                     }
@@ -326,7 +331,7 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.MEDICINE)
                         {
-                            cargoLoaded.IsLoaded = false;
+                            cargoLoaded.IsLoadedOnTheShip = false;
                             cargoLoaded.IsAvalaibleForFlicking = true;
                         }
                     }
@@ -336,13 +341,129 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.SUPPLIES)
                         {
-                            cargoLoaded.IsLoaded = false;
+                            cargoLoaded.IsLoadedOnTheShip = false;
                             cargoLoaded.IsAvalaibleForFlicking = true;
                         }
                     }
                     break;
             }
         }
+
+        //Island
+        public void ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(CargoTypes cargoType)
+        {
+            switch (cargoType)
+            {
+                case CargoTypes.SCREW_PART:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.SCREW_PART)
+                        {
+                            cargoLoaded._isLoadedOnTheIsland = true;
+                            cargoLoaded.IsAvalaibleForFlicking = false;
+                        }
+                    }
+                    break;
+                case CargoTypes.CREW_MEMBER:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.CREW_MEMBER)
+                        {
+                            cargoLoaded._isLoadedOnTheIsland = true;
+                            cargoLoaded.IsAvalaibleForFlicking = false;
+                        }
+                    }
+                    break;
+                case CargoTypes.FUEL:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.FUEL)
+                        {
+                            cargoLoaded._isLoadedOnTheIsland = true;
+                            cargoLoaded.IsAvalaibleForFlicking = false;
+                        }
+                    }
+                    break;
+                case CargoTypes.MEDICINE:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.MEDICINE)
+                        {
+                            cargoLoaded.IsLoadedOnTheShip = true;
+                            cargoLoaded.IsAvalaibleForFlicking = false;
+                        }
+                    }
+                    break;
+                case CargoTypes.SUPPLIES:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.SUPPLIES)
+                        {
+                            cargoLoaded._isLoadedOnTheIsland = true;
+                            cargoLoaded.IsAvalaibleForFlicking = false;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        public void DeactivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(CargoTypes cargoType)
+        {
+            switch (cargoType)
+            {
+                case CargoTypes.SCREW_PART:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.SCREW_PART)
+                        {
+                            cargoLoaded._isLoadedOnTheIsland = false;
+                            cargoLoaded.IsAvalaibleForFlicking = true;
+                        }
+                    }
+                    break;
+                case CargoTypes.CREW_MEMBER:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.CREW_MEMBER)
+                        {
+                            cargoLoaded._isLoadedOnTheIsland = false;
+                            cargoLoaded.IsAvalaibleForFlicking = true;
+                        }
+                    }
+                    break;
+                case CargoTypes.FUEL:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.FUEL)
+                        {
+                            cargoLoaded._isLoadedOnTheIsland = false;
+                            cargoLoaded.IsAvalaibleForFlicking = true;
+                        }
+                    }
+                    break;
+                case CargoTypes.MEDICINE:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.MEDICINE)
+                        {
+                            cargoLoaded._isLoadedOnTheIsland = false;
+                            cargoLoaded.IsAvalaibleForFlicking = true;
+                        }
+                    }
+                    break;
+                case CargoTypes.SUPPLIES:
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
+                    {
+                        if (cargoLoaded.cargoType == CargoTypes.SUPPLIES)
+                        {
+                            cargoLoaded._isLoadedOnTheIsland = false;
+                            cargoLoaded.IsAvalaibleForFlicking = true;
+                        }
+                    }
+                    break;
+            }
+        }
+
 
         #endregion
 
@@ -496,9 +617,10 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeShowTheLayoutToThePlayerState()
         {
-            _originalPositionOfTheFlag = flag.transform.localPosition;
+            //_originalPositionOfTheFlag = flag.transform.localPosition;
             _aCargoHasTouchedTheShip = false;
             _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
+            _shipPivotHasTouchedTheIsland = false;
 
             //TODO: Make the proper initialization of the state
 
@@ -540,10 +662,27 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeChooseTokenByPlayerState()
         {
-            foreach(Cargo cargo in shipOfTheGame._cargoesLoaded)
+            //_originalPositionOfTheFlag = flag.transform.localPosition;
+            _aCargoHasTouchedTheShip = false;
+            _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
+            _shipPivotHasTouchedTheIsland = false;
+
+            shipPivotOfTheGame.IsAvalaibleForFlicking = true;
+
+            shipPivotOfTheGame.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+
+            for(int i = 0; i < shipOfTheGame._cargoesLoadedOnTheShip.Count - 1; ++i)
             {
-                cargo.gameObject.transform.position = shipOfTheGame.gameObject.transform.position + new Vector3(0.0f, 0.0f + 3.0f, 0.0f);
-                cargo.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+                ActivateIsLoadedOnTheShipForAllCargoesOfTheSameType(shipOfTheGame._cargoesLoadedOnTheShip[i].cargoType);
+                shipOfTheGame._cargoesLoadedOnTheShip[i].gameObject.transform.position = cargoPositionsOnShip[i].position;
+                shipOfTheGame._cargoesLoadedOnTheShip[i].StateMechanic(TokenStateMechanic.SET_SPOOKY);
+            }
+
+            for (int i = 0; i < islandOfTheGame._cargoesLoadedOnIsland.Count - 1; ++i)
+            {
+                ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(islandOfTheGame._cargoesLoadedOnIsland[i].cargoType);
+                islandOfTheGame._cargoesLoadedOnIsland[i].gameObject.transform.position = cargoPositionsOnIsland[i].position;
+                islandOfTheGame._cargoesLoadedOnIsland[i].StateMechanic(TokenStateMechanic.SET_SPOOKY);
             }
 
             _nearestCargoToTheShip = shipOfTheGame.NearestCargo();
@@ -551,27 +690,28 @@ namespace MrSanmi.RecollectionSnooker
             _nearestCargoToTheShip.gameObject.SetActive(false);
 
             //All cargo is set to Spooky
-            for (int i = 0; i < allCargoOfTheGame.Length - 1; ++i)
-            {
-                if (allCargoOfTheGame[i].IsLoaded)
-                {
-                    allCargoOfTheGame[i].IsAvalaibleForFlicking = false;
-                }
-                else
-                {
-                    allCargoOfTheGame[i].StateMechanic(TokenStateMechanic.SET_SPOOKY);
-                }
-                
-            }
-            //TODO: Set Spooky for ships, monster parts and ship pivots
+            //for (int i = 0; i < allCargoOfTheGame.Length - 1; ++i)
+            //{
+            //    if (allCargoOfTheGame[i].IsLoadedOnTheShip || allCargoOfTheGame[i]._isLoadedOnTheIsland)
+            //    {
+            //        allCargoOfTheGame[i].IsAvalaibleForFlicking = false;
+            //    }
+            //    else
+            //    {
+            //        allCargoOfTheGame[i].StateMechanic(TokenStateMechanic.SET_SPOOKY);
+            //    }
+            //}
 
-            //Activate the table camera (with the highest priority)
-            ChangeCameraTo(tableFreeLookCamera);
+                //}
+                //TODO: Set Spooky for ships, monster parts and ship pivots
+
+                //Activate the table camera (with the highest priority)
+                ChangeCameraTo(tableFreeLookCamera);
 
             //Check available cargo for flicking
             foreach (Cargo cargo in allCargoOfTheGame)
             {
-                if (!cargo.IsLoaded)
+                if (!cargo.IsLoadedOnTheShip || !cargo._isLoadedOnTheIsland)
                 {
                     cargo.SetHighlight(true);
                     cargo.IsAvalaibleForFlicking = true;
@@ -637,7 +777,7 @@ namespace MrSanmi.RecollectionSnooker
         {
             flag.gameObject.SetActive(false);
             flag.transform.localRotation = Quaternion.identity;
-            flag.gameObject.transform.localPosition = _originalPositionOfTheFlag;
+            //flag.gameObject.transform.localPosition = _originalPositionOfTheFlag;
             _nearestCargoToTheShip.gameObject.SetActive(true);
             _nearestCargoToTheShip = null;
         }
@@ -656,11 +796,13 @@ namespace MrSanmi.RecollectionSnooker
             {
                 cargo.StateMechanic(TokenStateMechanic.SET_PHYSICS);
             }
+
+            shipPivotOfTheGame.StateMechanic(TokenStateMechanic.SET_PHYSICS);
         }
 
         protected void ExecutingCannonByNavigationState()
         {
-            if (IsAllCargoStill())
+            if (IsAllCargoStill() && shipPivotOfTheGame.IsStill)
             {
                 if (_gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart)
                 {
@@ -668,7 +810,7 @@ namespace MrSanmi.RecollectionSnooker
                 }
                 else
                 {
-                    if (_shipPivotHasTouchedTheIsland && (_cargoToBeLoaded != null && !shipOfTheGame._cargoesLoaded.Contains(_cargoToBeLoaded)))
+                    if (_shipPivotHasTouchedTheIsland)
                     {
                         GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
                     }
@@ -682,7 +824,12 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void FinalizeCannonByNavigationState()
         {
+            foreach (Cargo cargo in allCargoOfTheGame)
+            {
+                cargo.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+            }
 
+            shipPivotOfTheGame.StateMechanic(TokenStateMechanic.SET_SPOOKY);
         }
 
         #endregion
@@ -737,11 +884,13 @@ namespace MrSanmi.RecollectionSnooker
             {
                 cargo.StateMechanic(TokenStateMechanic.SET_PHYSICS);
             }
+
+            shipPivotOfTheGame.StateMechanic(TokenStateMechanic.SET_PHYSICS);
         }
 
         protected void ExecutingCannonCargoState()
         {
-            if (IsAllCargoStill())
+            if (IsAllCargoStill() && shipPivotOfTheGame.IsStill)
             {
                 if (_gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart)
                 {
@@ -749,7 +898,7 @@ namespace MrSanmi.RecollectionSnooker
                 }
                 else
                 {
-                    if (_aCargoHasTouchedTheShip && (_cargoToBeLoaded != null && !shipOfTheGame._cargoesLoaded.Contains(_cargoToBeLoaded)))
+                    if (_aCargoHasTouchedTheShip && (_cargoToBeLoaded != null && !shipOfTheGame._cargoesLoadedOnTheShip.Contains(_cargoToBeLoaded)))
                     {
                         GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
                     }
@@ -767,6 +916,8 @@ namespace MrSanmi.RecollectionSnooker
             {
                 cargo.StateMechanic(TokenStateMechanic.SET_SPOOKY);
             }
+
+            shipPivotOfTheGame.StateMechanic(TokenStateMechanic.SET_SPOOKY);
         }
 
         #endregion
@@ -781,7 +932,7 @@ namespace MrSanmi.RecollectionSnooker
 
                 foreach (Cargo cargo in allCargoOfTheGame)
                 {
-                    if (cargo != _cargoToBeLoaded && !cargo.IsLoaded)
+                    if (cargo != _cargoToBeLoaded && !cargo.IsLoadedOnTheShip)
                     {
                         cargo.gameObject.SetActive(false);
                     }
@@ -793,7 +944,19 @@ namespace MrSanmi.RecollectionSnooker
             {
                 ChangeCameraTo(islandVirtualCamera);
 
+                foreach (Cargo cargo in allCargoOfTheGame)
+                {
+                    if (cargo != _cargoToBeLoaded && !cargo.IsLoadedOnTheShip)
+                    {
+                        cargo.gameObject.SetActive(false);
+                    }
+                    else if (cargo.IsLoadedOnTheShip)
+                    {
+                        cargo.gameObject.SetActive(false);
+                    }
+                }
 
+                _cargoToBeLoaded.StateMechanic(TokenStateMechanic.SET_SPOOKY);
             }
         }
 
@@ -926,20 +1089,10 @@ namespace MrSanmi.RecollectionSnooker
             set { _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = value; }
         }
 
-        public bool SetShipPivotHasTouchedTheIsland
-        {
-            set { _shipPivotHasTouchedTheIsland = value; }
-        }
-
         public Cargo CargoToBeLoaded
         {
             set { _cargoToBeLoaded = value; }
             get { return _cargoToBeLoaded; }
-        }
-
-        public bool SetACargoHasTouchedTheShip
-        {
-            set { _aCargoHasTouchedTheShip = value; }
         }
 
         #endregion

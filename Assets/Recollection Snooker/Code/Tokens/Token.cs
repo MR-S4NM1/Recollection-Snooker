@@ -61,9 +61,9 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnCollisionEnter(Collision other)
         {
-            //_gameReferee.DebugInMobile(gameObject.name + 
-            //    " OnCollisionEnter() - Detected collision with " + 
-            //    other.gameObject.name);
+            _gameReferee.DebugInMobile(gameObject.name +
+                " OnCollisionEnter() - Detected collision with " +
+                other.gameObject.name);
             switch (_gameReferee.GetGameState)
             {
                 case RS_GameStates.CANNON_CARGO:
@@ -86,9 +86,9 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnTriggerEnter(Collider other)
         {
-            //_gameReferee.DebugInMobile(gameObject.name +
-            //    " OnTriggerEnter() - Detected collision with " + 
-            //    other.gameObject.name);
+            _gameReferee.DebugInMobile(gameObject.name +
+                " OnTriggerEnter() - Detected collision with " +
+                other.gameObject.name);
             ValidateTrigger(other);
 
             switch (_gameReferee.GetGameState)
@@ -139,7 +139,6 @@ namespace MrSanmi.RecollectionSnooker
             {
                 if (other.gameObject.CompareTag("MonsterLimb"))
                 {
-                    print("You lose a life");
                     _gameReferee.SetGameRefereeHasConfirmedThatNoCargoOrShipPivotHaveTouchedAMonsterPart = true;
                 }
             }
@@ -151,7 +150,6 @@ namespace MrSanmi.RecollectionSnooker
             {
                 if (other.gameObject.CompareTag("MonsterLimb"))
                 {
-                    print("You lose a life");
                     _gameReferee.SetGameRefereeHasConfirmedThatNoCargoOrShipPivotHaveTouchedAMonsterPart = true;
                 }
             }
