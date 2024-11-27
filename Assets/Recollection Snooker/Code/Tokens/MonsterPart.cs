@@ -101,7 +101,7 @@ namespace MrSanmi.RecollectionSnooker
                 {
                     _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
                     _randomPosToPlaceToken = new Vector3(Random.Range(-22, 22), 0, Random.Range(-22, 22));
-                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 10.0f, _randomPosToPlaceToken.z), 8.0f, -transform.up * 1.0f, out _raycastHit, 10.0f))
+                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 6.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
                     {
                         if (!_raycastHit.collider.gameObject.GetComponent<Token>())
                         {
@@ -111,7 +111,6 @@ namespace MrSanmi.RecollectionSnooker
                         }
                     }
                 }
-                print(canBePlacedAtThePosition);
             }
             else if (monsterPartType == MonsterPartType.LIMB)
             {
@@ -121,7 +120,7 @@ namespace MrSanmi.RecollectionSnooker
                 {
                     _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
                     _randomPosToPlaceToken = new Vector3(Random.Range(-22, 22), 0, Random.Range(-22, 22));
-                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 6.0f, _randomPosToPlaceToken.z), 8.0f, -transform.up * 1.0f, out _raycastHit, 6.0f))
+                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 6.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
                     {
                         if (!_raycastHit.collider.gameObject.GetComponent<Token>())
                         {
@@ -131,7 +130,6 @@ namespace MrSanmi.RecollectionSnooker
                         }
                     }
                 }
-                print(canBePlacedAtThePosition);
             }
         }
 

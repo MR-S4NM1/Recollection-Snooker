@@ -39,6 +39,13 @@ namespace MrSanmi.RecollectionSnooker
         private void OnTriggerEnter(Collider other)
         {
             OnTriggerEvent(other);
+
+            switch (_gameReferee.GetGameState)
+            {
+                case RS_GameStates.FLICK_TOKEN_BY_PLAYER:
+                    ValidateTriggerWithFlag(other);
+                    break;
+            }
         }
 
         private void OnDrawGizmos()

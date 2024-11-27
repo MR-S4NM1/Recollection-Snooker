@@ -5,6 +5,7 @@ using MrSanmi.Game;
 using Cinemachine;
 using TMPro;
 using Unity.VisualScripting;
+using System;
 
 namespace MrSanmi.RecollectionSnooker
 {
@@ -162,13 +163,13 @@ namespace MrSanmi.RecollectionSnooker
                     }
                     break;
                 case RS_GameStates.CONTACT_POINT_TOKEN_BY_PLAYER:
-                    if (_gameState == RS_GameStates.CHOOSE_TOKEN_BY_PLAYER ||
-                        _gameState == RS_GameStates.FLICK_TOKEN_BY_PLAYER)
+                    if (_gameState == RS_GameStates.CHOOSE_TOKEN_BY_PLAYER)
                     {
                         FinalizeCurrentState(toNextState);
                     }
                     break;
                 case RS_GameStates.FLICK_TOKEN_BY_PLAYER:
+                    Debug.Log(_gameState + " entra a flick token by player");
                     if (_gameState == RS_GameStates.CONTACT_POINT_TOKEN_BY_PLAYER)
                     {
                         FinalizeCurrentState(toNextState);
@@ -206,7 +207,8 @@ namespace MrSanmi.RecollectionSnooker
                     }
                     break;
                 case RS_GameStates.MOVE_COUNTER_BY_SANCTION:
-                    if (_gameState == RS_GameStates.CANNON_CARGO)
+                    if (_gameState == RS_GameStates.CANNON_CARGO ||
+                        _gameState == RS_GameStates.CANNON_BY_NAVIGATION)
                     {
                         FinalizeCurrentState(toNextState);
                     }
@@ -238,14 +240,24 @@ namespace MrSanmi.RecollectionSnooker
         //Ship
         public void ActivateIsLoadedOnTheShipForAllCargoesOfTheSameType(CargoTypes cargoType)
         {
+            //if(shipOfTheGame._cargoesLoadedOnTheShip.Count > 0)
+            //{
+            //    foreach(Cargo cargo in shipOfTheGame._cargoesLoadedOnTheShip)
+            //    {
+            //        if (cargo.cargoType == cargoType)
+            //        {
+
+            //        }
+            //    }
+            //}
+
             switch (cargoType)
             {
                 case CargoTypes.SCREW_PART:
-                    foreach(Cargo cargoLoaded in allCargoOfTheGame)
+                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
                     {
-                        if(cargoLoaded.cargoType == CargoTypes.SCREW_PART)
+                        if (cargoLoaded.cargoType == CargoTypes.SCREW_PART)
                         {
-                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -255,7 +267,6 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.CREW_MEMBER)
                         {
-                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -265,7 +276,6 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.FUEL)
                         {
-                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -275,7 +285,6 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.MEDICINE)
                         {
-                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -285,7 +294,6 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.SUPPLIES)
                         {
-                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -360,7 +368,6 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.SCREW_PART)
                         {
-                            cargoLoaded._isLoadedOnTheIsland = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -370,7 +377,6 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.CREW_MEMBER)
                         {
-                            cargoLoaded._isLoadedOnTheIsland = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -380,7 +386,6 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.FUEL)
                         {
-                            cargoLoaded._isLoadedOnTheIsland = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -390,7 +395,6 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.MEDICINE)
                         {
-                            cargoLoaded.IsLoadedOnTheShip = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
                         }
                     }
@@ -400,65 +404,7 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         if (cargoLoaded.cargoType == CargoTypes.SUPPLIES)
                         {
-                            cargoLoaded._isLoadedOnTheIsland = true;
                             cargoLoaded.IsAvalaibleForFlicking = false;
-                        }
-                    }
-                    break;
-            }
-        }
-
-        public void DeactivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(CargoTypes cargoType)
-        {
-            switch (cargoType)
-            {
-                case CargoTypes.SCREW_PART:
-                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
-                    {
-                        if (cargoLoaded.cargoType == CargoTypes.SCREW_PART)
-                        {
-                            cargoLoaded._isLoadedOnTheIsland = false;
-                            cargoLoaded.IsAvalaibleForFlicking = true;
-                        }
-                    }
-                    break;
-                case CargoTypes.CREW_MEMBER:
-                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
-                    {
-                        if (cargoLoaded.cargoType == CargoTypes.CREW_MEMBER)
-                        {
-                            cargoLoaded._isLoadedOnTheIsland = false;
-                            cargoLoaded.IsAvalaibleForFlicking = true;
-                        }
-                    }
-                    break;
-                case CargoTypes.FUEL:
-                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
-                    {
-                        if (cargoLoaded.cargoType == CargoTypes.FUEL)
-                        {
-                            cargoLoaded._isLoadedOnTheIsland = false;
-                            cargoLoaded.IsAvalaibleForFlicking = true;
-                        }
-                    }
-                    break;
-                case CargoTypes.MEDICINE:
-                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
-                    {
-                        if (cargoLoaded.cargoType == CargoTypes.MEDICINE)
-                        {
-                            cargoLoaded._isLoadedOnTheIsland = false;
-                            cargoLoaded.IsAvalaibleForFlicking = true;
-                        }
-                    }
-                    break;
-                case CargoTypes.SUPPLIES:
-                    foreach (Cargo cargoLoaded in allCargoOfTheGame)
-                    {
-                        if (cargoLoaded.cargoType == CargoTypes.SUPPLIES)
-                        {
-                            cargoLoaded._isLoadedOnTheIsland = false;
-                            cargoLoaded.IsAvalaibleForFlicking = true;
                         }
                     }
                     break;
@@ -481,11 +427,6 @@ namespace MrSanmi.RecollectionSnooker
         {
             _isAllCargoStill = true;
 
-            if (!shipPivotOfTheGame.IsStill)
-            {
-                _isAllCargoStill = false;
-            }
-
             foreach (Token token in allCargoOfTheGame)
             {
                 if (!token.IsStill)
@@ -493,6 +434,10 @@ namespace MrSanmi.RecollectionSnooker
                     _isAllCargoStill = false;
                     break;
                 }
+            }
+            if (!shipPivotOfTheGame.IsStill)
+            {
+                _isAllCargoStill = false;
             }
             return _isAllCargoStill;
         }
@@ -635,7 +580,7 @@ namespace MrSanmi.RecollectionSnooker
 
             foreach (Cargo cargo in allCargoOfTheGame)
             {
-                _randomTokenPos = Random.Range(0, tokenPosList.Count - 1);
+                _randomTokenPos = UnityEngine.Random.Range(0, tokenPosList.Count - 1);
                 cargo.gameObject.transform.position = tokenPosList[_randomTokenPos].position;
                 tokenPosList.RemoveAt(_randomTokenPos);
             }
@@ -669,6 +614,9 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeChooseTokenByPlayerState()
         {
+
+            ChangeCameraTo(tableFreeLookCamera);
+
             cargoSpaceOnShip.SetActive(false);
             //_originalPositionOfTheFlag = flag.transform.localPosition;
             _aCargoHasTouchedTheShip = false;
@@ -679,19 +627,17 @@ namespace MrSanmi.RecollectionSnooker
 
             shipPivotOfTheGame.StateMechanic(TokenStateMechanic.SET_SPOOKY);
 
-            for(int i = 0; i < shipOfTheGame._cargoesLoadedOnTheShip.Count - 1; ++i)
+            for(int i = 0; i < shipOfTheGame._cargoesLoadedOnTheShip.Count; ++i)
             {
                 ActivateIsLoadedOnTheShipForAllCargoesOfTheSameType(shipOfTheGame._cargoesLoadedOnTheShip[i].cargoType);
                 shipOfTheGame._cargoesLoadedOnTheShip[i].gameObject.transform.position = cargoPositionsOnShip[i].position;
-                shipOfTheGame._cargoesLoadedOnTheShip[i].IsAvalaibleForFlicking = false;
                 shipOfTheGame._cargoesLoadedOnTheShip[i].StateMechanic(TokenStateMechanic.SET_RIGID);
             }
 
-            for (int i = 0; i < islandOfTheGame._cargoesLoadedOnIsland.Count - 1; ++i)
+            for (int i = 0; i < islandOfTheGame._cargoesLoadedOnIsland.Count; ++i)
             {
                 ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(islandOfTheGame._cargoesLoadedOnIsland[i].cargoType);
                 islandOfTheGame._cargoesLoadedOnIsland[i].gameObject.transform.position = cargoPositionsOnIsland[i].position;
-                islandOfTheGame._cargoesLoadedOnIsland[i].IsAvalaibleForFlicking = false;
                 islandOfTheGame._cargoesLoadedOnIsland[i].StateMechanic(TokenStateMechanic.SET_RIGID);
             }
 
@@ -716,7 +662,6 @@ namespace MrSanmi.RecollectionSnooker
                 //TODO: Set Spooky for ships, monster parts and ship pivots
 
                 //Activate the table camera (with the highest priority)
-                ChangeCameraTo(tableFreeLookCamera);
 
             //Check available cargo for flicking
             foreach (Cargo cargo in allCargoOfTheGame)
@@ -839,6 +784,10 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void FinalizeCannonByNavigationState()
         {
+            _aCargoHasTouchedTheShip = false;
+            _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
+            _shipPivotHasTouchedTheIsland = false;
+
             foreach (Cargo cargo in allCargoOfTheGame)
             {
                 cargo.StateMechanic(TokenStateMechanic.SET_SPOOKY);
@@ -1002,9 +951,17 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeMoveCounterBySanctionState()
         {
-            healthPoints -= 1;
-            print("You lose a life");
-            GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+            if(healthPoints <= 1)
+            {
+                print("You lose the game");
+                GameStateMechanic(RS_GameStates.FAILURE_OF_THE_PLAYER);
+            }
+            else if(healthPoints > 1)
+            {
+                healthPoints -= 1;
+                print("You lose a life");
+                GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+            }
         }
 
         protected void ExecutingMoveCounterBySanctionState()
@@ -1026,6 +983,11 @@ namespace MrSanmi.RecollectionSnooker
             foreach (MonsterPart monsterPart in allMonsterPartOfTheGame)
             {
                 monsterPart.ValidateSpaceToSpawnMonsterPart();
+            }
+
+            for(int i = 0; i < allMonsterPartOfTheGame.Length; i++)
+            {
+                allMonsterPartOfTheGame[i].ValidateSpaceToSpawnMonsterPart();
             }
 
             GameStateMechanic(RS_GameStates.CHOOSE_TOKEN_BY_PLAYER);

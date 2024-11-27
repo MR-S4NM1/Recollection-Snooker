@@ -54,10 +54,15 @@ namespace MrSanmi.RecollectionSnooker
 
         }
 
-        //private void OnCollisionEnter(Collision other)
-        //{
-        //    ValidateCollision(other);
-        //}
+        private void OnCollisionEnter(Collision other)
+        {
+            switch (_gameReferee.GetGameState)
+            {
+                case RS_GameStates.CANNON_CARGO:
+                    ValidateShipHasTouchedACargoDuringCannonCollision(other);
+                    break;
+            }
+        }
 
         private void OnDrawGizmos()
         {
@@ -96,6 +101,15 @@ namespace MrSanmi.RecollectionSnooker
         void ValidateShipHasTouchedACargoDuringCannon(Collider other)
         {
             if (other.CompareTag("Cargo") && !other.gameObject.GetComponent<Cargo>().IsLoadedOnTheShip &&
+                (!_cargoesLoadedOnTheShip.Contains(other.gameObject.GetComponent<Cargo>())))
+            {
+                _gameReferee._aCargoHasTouchedTheShip = true;
+            }
+        }
+
+        void ValidateShipHasTouchedACargoDuringCannonCollision(Collision other)
+        {
+            if (other.gameObject.CompareTag("Cargo") && !other.gameObject.GetComponent<Cargo>().IsLoadedOnTheShip &&
                 (!_cargoesLoadedOnTheShip.Contains(other.gameObject.GetComponent<Cargo>())))
             {
                 _gameReferee._aCargoHasTouchedTheShip = true;

@@ -66,6 +66,16 @@ namespace MrSanmi.RecollectionSnooker
             }
         }
 
+        private void OnCollisionEnter(Collision other)
+        {
+            switch (_gameReferee.GetGameState)
+            {
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateIslandHasTouchedTheShipPivotDuringCannonByNavigationCollision(other);
+                    break;
+            }
+        }
+
         #endregion
 
         #region RuntimeMethods
@@ -81,7 +91,15 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void ValidateIslandHasTouchedTheShipPivotDuringCannonByNavigationTrigger(Collider other)
         {
-            if (other.CompareTag("ShipPivot") && (_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count > 0))
+            if (other.CompareTag("ShipPivot") /*&& (_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count > 0)*/)
+            {
+                _gameReferee._shipPivotHasTouchedTheIsland = true;
+            }
+        }
+
+        protected void ValidateIslandHasTouchedTheShipPivotDuringCannonByNavigationCollision(Collision other)
+        {
+            if (other.gameObject.CompareTag("ShipPivot") /*&& (_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count > 0)*/)
             {
                 _gameReferee._shipPivotHasTouchedTheIsland = true;
             }
