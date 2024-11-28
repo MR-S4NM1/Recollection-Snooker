@@ -194,41 +194,38 @@ namespace MrSanmi.RecollectionSnooker
         {
             if (value.performed)
             {
-                if (_gameReferee._aCargoHasTouchedTheShip)
+                if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),
+                out _raycastHit, 100.0f, LayerMask.GetMask("CargoSpace")))
                 {
-                    if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),
-                    out _raycastHit, 100.0f, LayerMask.GetMask("CargoSpace")))
-                    {
-                        _goTouchCursor.SetActive(true);
-                        _goTouchCursor.transform.position = _raycastHit.point;
-                        _gameReferee.CargoToBeLoaded.gameObject.transform.position = Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,
-                            _raycastHit.point, 0.5f);
-                    }
-                    else
-                    {
-                        _goTouchCursor.SetActive(false);
-                    }
+                    _goTouchCursor.SetActive(true);
+                    _goTouchCursor.transform.position = _raycastHit.point;
+                    _gameReferee.CargoToBeLoaded.gameObject.transform.position = Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,
+                        _raycastHit.point, 0.5f);
                 }
-                else if (_gameReferee._shipPivotHasTouchedTheIsland)
+                else
                 {
-                    if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),
-                        out _raycastHit, 100.0f, LayerMask.GetMask("IslandCargoSpace")))
-                    {
-                        _goTouchCursor.SetActive(true);
-                        _goTouchCursor.transform.position = _raycastHit.point;
+                    _goTouchCursor.SetActive(false);
+                }
+                //else if (_gameReferee._shipPivotHasTouchedTheIsland)
+                //{
+                //    if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),
+                //        out _raycastHit, 100.0f, LayerMask.GetMask("IslandCargoSpace")))
+                //    {
+                //        _goTouchCursor.SetActive(true);
+                //        _goTouchCursor.transform.position = _raycastHit.point;
 
-                        for (int i = 0; i < _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count; ++i)
-                        {
-                            _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip[i].gameObject.transform.position = 
-                                Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,
-                                _raycastHit.point, 0.5f);
-                        }
-                    }
-                    else
-                    {
-                        _goTouchCursor.SetActive(false);
-                    }
-                }
+                //        for (int i = 0; i < _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count; ++i)
+                //        {
+                //            _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip[i].gameObject.transform.position = 
+                //                Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,
+                //                _raycastHit.point, 0.5f);
+                //        }
+                //    }
+                //    else
+                //    {
+                //        _goTouchCursor.SetActive(false);
+                //    }
+                //}
             }
             else if (value.canceled)
             {

@@ -48,6 +48,27 @@ namespace MrSanmi.RecollectionSnooker
             }
         }
 
+        private void OnCollisionEnter(Collision other)
+        {
+            switch (_gameReferee.GetGameState)
+            {
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateCollisionOfTheIslandByShipPivot(other);
+                    break;
+            }
+        }
+
+        private void OnCollisionStay(Collision other)
+        {
+            switch (_gameReferee.GetGameState)
+            {
+                case RS_GameStates.CANNON_CARGO:
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateCollisionDuringCannon(other);
+                    break;
+            }
+        }
+
         private void OnDrawGizmos()
         {
             #if UNITY_EDITOR
@@ -59,9 +80,18 @@ namespace MrSanmi.RecollectionSnooker
 
         #region RuntimeMethods
 
+        protected void ValidateCollisionOfTheIslandByShipPivot(Collision other)
+        {
+            if (other.gameObject.CompareTag("Island") && _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count > 0)
+            {
+                _gameReferee._shipPivotHasTouchedTheIsland = true;
+            }
+        }
+
         #endregion
 
         #region PublicMethods
+
 
         #endregion
 

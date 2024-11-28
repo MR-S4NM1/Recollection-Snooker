@@ -91,10 +91,10 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         ValidateCargoHasBeenLoadedOnShip(other);
                     }
-                    else if (_gameReferee._shipPivotHasTouchedTheIsland)
-                    {
-                        ValidateCargoHasBeenLoadedOnIsland(other);
-                    }
+                    //else if (_gameReferee._shipPivotHasTouchedTheIsland)
+                    //{
+                    //    ValidateCargoHasBeenLoadedOnIsland(other);
+                    //}
                     break;
             }
         }
@@ -112,10 +112,10 @@ namespace MrSanmi.RecollectionSnooker
                     {
                         ValidateCollisionsByLoadingCargoOnShip(other);
                     }
-                    else if (_gameReferee._shipPivotHasTouchedTheIsland)
-                    {
-                        ValidateCollisionsByLoadingCargoOnIsland(other);
-                    }
+                    //else if (_gameReferee._shipPivotHasTouchedTheIsland)
+                    //{
+                    //    ValidateCollisionsByLoadingCargoOnIsland(other);
+                    //}
                     break;
             }
         }
@@ -174,53 +174,53 @@ namespace MrSanmi.RecollectionSnooker
         }
 
         //Island
-        protected void ValidateCollisionsByLoadingCargoOnIsland(Collision other)
-        {
-            if (_isLoadedOnTheIsland) //If it's loaded, DON'T LOAD IT!
-            {
-                return;
-            }
+        //protected void ValidateCollisionsByLoadingCargoOnIsland(Collision other)
+        //{
+        //    if (_isLoadedOnTheIsland) //If it's loaded, DON'T LOAD IT!
+        //    {
+        //        return;
+        //    }
 
-            if (other.gameObject.CompareTag("IslandCargoSpace"))
-            {
+        //    if (other.gameObject.CompareTag("IslandCargoSpace"))
+        //    {
 
-                _isLoadedOnTheShip = false;
-                _isLoadedOnTheIsland = true;
-                _gameplayAttributes.isAvailableForFlicking = false;
-                _gameReferee.ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(this.cargoType);
-                _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Remove(this);
+        //        _isLoadedOnTheShip = false;
+        //        _isLoadedOnTheIsland = true;
+        //        _gameplayAttributes.isAvailableForFlicking = false;
+        //        _gameReferee.ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(this.cargoType);
+        //        _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Remove(this);
 
-                //Add cargo to the list
-                if (!_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Contains(this))
-                {
-                    _gameReferee.islandOfTheGame._cargoesLoadedOnIsland.Add(this);
-                }
-            }
-        }
+        //        Add cargo to the list
+        //        if (!_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Contains(this))
+        //        {
+        //            _gameReferee.islandOfTheGame._cargoesLoadedOnIsland.Add(this);
+        //        }
+        //    }
+        //}
 
-        protected void ValidateCargoHasBeenLoadedOnIsland(Collider other)
-        {
-            if (_isLoadedOnTheIsland) //If it's loaded, DON'T LOAD IT!
-            {
-                return;
-            }
+        //protected void ValidateCargoHasBeenLoadedOnIsland(Collider other)
+        //{
+        //    if (_isLoadedOnTheIsland) //If it's loaded, DON'T LOAD IT!
+        //    {
+        //        return;
+        //    }
 
-            if (other.gameObject.CompareTag("IslandCargoSpace"))
-            {
+        //    if (other.gameObject.CompareTag("IslandCargoSpace"))
+        //    {
 
-                _isLoadedOnTheShip = false;
-                _isLoadedOnTheIsland = true;
+        //        _isLoadedOnTheShip = false;
+        //        _isLoadedOnTheIsland = true;
 
-                _gameReferee.ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(this.cargoType);
-                _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Remove(this);
+        //        _gameReferee.ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(this.cargoType);
+        //        _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Remove(this);
 
-                //Add cargo to the list
-                if (!_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Contains(this))
-                {
-                    _gameReferee.islandOfTheGame._cargoesLoadedOnIsland.Add(this);
-                }
-            }
-        }
+        //        Add cargo to the list
+        //        if (!_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Contains(this))
+        //        {
+        //            _gameReferee.islandOfTheGame._cargoesLoadedOnIsland.Add(this);
+        //        }
+        //    }
+        //}
 
 
         #endregion

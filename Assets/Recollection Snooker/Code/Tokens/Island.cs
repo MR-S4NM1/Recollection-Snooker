@@ -35,16 +35,6 @@ namespace MrSanmi.RecollectionSnooker
             _cargos = GameObject.FindObjectsOfType<Cargo>(true);
         }
 
-        void Update()
-        {
-
-        }
-
-        //private void OnCollisionEnter(Collision other)
-        //{
-        //    ValidateCollision(other);
-        //}
-
         private void OnDrawGizmos()
         {
             #if UNITY_EDITOR
@@ -60,9 +50,9 @@ namespace MrSanmi.RecollectionSnooker
                 case RS_GameStates.CANNON_BY_NAVIGATION:
                     ValidateIslandHasTouchedTheShipPivotDuringCannonByNavigationTrigger(other);
                     break;
-                case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
-                    ValidateTriggerCargoDuringLoadingCargo(other);
-                    break;
+                //case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
+                //    ValidateTriggerCargoDuringLoadingCargo(other);
+                //    break;
             }
         }
 
@@ -80,18 +70,18 @@ namespace MrSanmi.RecollectionSnooker
 
         #region RuntimeMethods
 
-        protected void ValidateTriggerCargoDuringLoadingCargo(Collider other)
-        {
-            if (other.CompareTag("Cargo") && (!other.gameObject.GetComponent<Cargo>().IsLoadedOnTheShip) &&
-                (!_cargoesLoadedOnIsland.Contains(other.gameObject.GetComponent<Cargo>())))
-            {
-                _cargoesLoadedOnIsland.Add(other.gameObject.GetComponent<Cargo>());
-            }
-        }
+        //protected void ValidateTriggerCargoDuringLoadingCargo(Collider other)
+        //{
+        //    if (other.CompareTag("Cargo") && (!other.gameObject.GetComponent<Cargo>().IsLoadedOnTheShip) &&
+        //        (!_cargoesLoadedOnIsland.Contains(other.gameObject.GetComponent<Cargo>())))
+        //    {
+        //        _cargoesLoadedOnIsland.Add(other.gameObject.GetComponent<Cargo>());
+        //    }
+        //}
 
         protected void ValidateIslandHasTouchedTheShipPivotDuringCannonByNavigationTrigger(Collider other)
         {
-            if (other.CompareTag("ShipPivot") /*&& (_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count > 0)*/)
+            if (other.CompareTag("ShipPivot") && (_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count > 0))
             {
                 _gameReferee._shipPivotHasTouchedTheIsland = true;
             }
@@ -99,7 +89,7 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void ValidateIslandHasTouchedTheShipPivotDuringCannonByNavigationCollision(Collision other)
         {
-            if (other.gameObject.CompareTag("ShipPivot") /*&& (_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count > 0)*/)
+            if (other.gameObject.CompareTag("ShipPivot") && (_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Count > 0))
             {
                 _gameReferee._shipPivotHasTouchedTheIsland = true;
             }
@@ -109,21 +99,6 @@ namespace MrSanmi.RecollectionSnooker
         #endregion
 
         #region PublicMethods
-
-        public bool CheckIsATokenFromTheShipIsNotOnTheIsland()
-        {
-            _cargoIsNotOnIsland = false;
-
-            foreach (Cargo cargo in _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip)
-            {
-                if (!_cargoesLoadedOnIsland.Contains(cargo))
-                {
-                    _cargoIsNotOnIsland = true;
-                    break;
-                }
-            }
-            return _cargoIsNotOnIsland;
-        }
 
         #endregion
 

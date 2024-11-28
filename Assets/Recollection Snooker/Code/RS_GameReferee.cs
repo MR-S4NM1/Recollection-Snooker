@@ -169,7 +169,6 @@ namespace MrSanmi.RecollectionSnooker
                     }
                     break;
                 case RS_GameStates.FLICK_TOKEN_BY_PLAYER:
-                    Debug.Log(_gameState + " entra a flick token by player");
                     if (_gameState == RS_GameStates.CONTACT_POINT_TOKEN_BY_PLAYER)
                     {
                         FinalizeCurrentState(toNextState);
@@ -578,17 +577,12 @@ namespace MrSanmi.RecollectionSnooker
 
             // Putting all cargo at random positions in order to have some variety at the beginning of each game session
 
+            //Setting all cargo in the GHOST state
             foreach (Cargo cargo in allCargoOfTheGame)
             {
                 _randomTokenPos = UnityEngine.Random.Range(0, tokenPosList.Count - 1);
                 cargo.gameObject.transform.position = tokenPosList[_randomTokenPos].position;
                 tokenPosList.RemoveAt(_randomTokenPos);
-            }
-
-            //Setting all cargo in the GHOST state
-
-            foreach (Cargo cargo in allCargoOfTheGame)
-            {
                 cargo.StateMechanic(TokenStateMechanic.SET_SPOOKY);
             }
 
@@ -627,56 +621,46 @@ namespace MrSanmi.RecollectionSnooker
 
             shipPivotOfTheGame.StateMechanic(TokenStateMechanic.SET_SPOOKY);
 
-            for(int i = 0; i < shipOfTheGame._cargoesLoadedOnTheShip.Count; ++i)
-            {
-                ActivateIsLoadedOnTheShipForAllCargoesOfTheSameType(shipOfTheGame._cargoesLoadedOnTheShip[i].cargoType);
-                shipOfTheGame._cargoesLoadedOnTheShip[i].gameObject.transform.position = cargoPositionsOnShip[i].position;
-                shipOfTheGame._cargoesLoadedOnTheShip[i].StateMechanic(TokenStateMechanic.SET_RIGID);
-            }
+            shipOfTheGame.StateMechanic(TokenStateMechanic.SET_SPOOKY);
 
-            for (int i = 0; i < islandOfTheGame._cargoesLoadedOnIsland.Count; ++i)
+            for (int i = 0; i < allCargoOfTheGame.Length; ++i)
             {
-                ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(islandOfTheGame._cargoesLoadedOnIsland[i].cargoType);
-                islandOfTheGame._cargoesLoadedOnIsland[i].gameObject.transform.position = cargoPositionsOnIsland[i].position;
-                islandOfTheGame._cargoesLoadedOnIsland[i].StateMechanic(TokenStateMechanic.SET_RIGID);
+                if (islandOfTheGame._cargoesLoadedOnIsland.Count > 0 || shipOfTheGame._cargoesLoadedOnTheShip.Count > 0)
+                {
+                    if (allCargoOfTheGame[i].IsLoadedOnTheShip)
+                    {
+                        ActivateIsLoadedOnTheShipForAllCargoesOfTheSameType(shipOfTheGame._cargoesLoadedOnTheShip[i].cargoType);
+                        allCargoOfTheGame[i].gameObject.transform.position = cargoPositionsOnShip[i].position;
+                        allCargoOfTheGame[i].StateMechanic(TokenStateMechanic.SET_RIGID);
+                        allCargoOfTheGame[i].SetHighlight(false);
+                        allCargoOfTheGame[i].IsAvalaibleForFlicking = false;
+                    }
+                    else if (allCargoOfTheGame[i]._isLoadedOnTheIsland)
+                    {
+                        ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(islandOfTheGame._cargoesLoadedOnIsland[i].cargoType);
+                        allCargoOfTheGame[i].gameObject.transform.position = cargoPositionsOnIsland[i].position;
+                        allCargoOfTheGame[i].StateMechanic(TokenStateMechanic.SET_RIGID);
+                        allCargoOfTheGame[i].SetHighlight(false);
+                        allCargoOfTheGame[i].IsAvalaibleForFlicking = false;
+                    }
+                }
+                if (!allCargoOfTheGame[i].IsLoadedOnTheShip || !allCargoOfTheGame[i]._isLoadedOnTheIsland)
+                {
+                    allCargoOfTheGame[i].StateMechanic(TokenStateMechanic.SET_SPOOKY);
+                    allCargoOfTheGame[i].SetHighlight(true);
+                    allCargoOfTheGame[i].IsAvalaibleForFlicking = true;
+                }
             }
 
             _nearestCargoToTheShip = shipOfTheGame.NearestCargo();
 
             _nearestCargoToTheShip.gameObject.SetActive(false);
 
-            //All cargo is set to Spooky
-            //for (int i = 0; i < allCargoOfTheGame.Length - 1; ++i)
-            //{
-            //    if (allCargoOfTheGame[i].IsLoadedOnTheShip || allCargoOfTheGame[i]._isLoadedOnTheIsland)
-            //    {
-            //        allCargoOfTheGame[i].IsAvalaibleForFlicking = false;
-            //    }
-            //    else
-            //    {
-            //        allCargoOfTheGame[i].StateMechanic(TokenStateMechanic.SET_SPOOKY);
-            //    }
-            //}
+            //TODO: Set Spooky for ships, monster parts and ship pivots
 
-                //}
-                //TODO: Set Spooky for ships, monster parts and ship pivots
-
-                //Activate the table camera (with the highest priority)
+            //Activate the table camera (with the highest priority)
 
             //Check available cargo for flicking
-            foreach (Cargo cargo in allCargoOfTheGame)
-            {
-                if (!cargo.IsLoadedOnTheShip || !cargo._isLoadedOnTheIsland)
-                {
-                    cargo.SetHighlight(true);
-                    cargo.IsAvalaibleForFlicking = true;
-                }
-                else
-                {
-                    cargo.SetHighlight(false);
-                    cargo.IsAvalaibleForFlicking = false;
-                }
-            }
 
             _nearestCargoToTheShip.IsAvalaibleForFlicking = false;
         }
@@ -748,13 +732,18 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeCannonByNavigationState()
         {
+            shipOfTheGame.StateMechanic(TokenStateMechanic.SET_PHYSICS);
+
             _nearestCargoToTheShip?.gameObject.SetActive(true);
             _nearestCargoToTheShip = null;
             _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
 
             foreach (Cargo cargo in allCargoOfTheGame)
             {
-                cargo.StateMechanic(TokenStateMechanic.SET_PHYSICS);
+                if(!cargo.IsLoadedOnTheShip || !cargo._isLoadedOnTheIsland)
+                {
+                    cargo.StateMechanic(TokenStateMechanic.SET_PHYSICS);
+                }
             }
 
             shipPivotOfTheGame.StateMechanic(TokenStateMechanic.SET_PHYSICS);
@@ -784,9 +773,9 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void FinalizeCannonByNavigationState()
         {
-            _aCargoHasTouchedTheShip = false;
-            _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
-            _shipPivotHasTouchedTheIsland = false;
+            //_aCargoHasTouchedTheShip = false;
+            //_gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
+            //_shipPivotHasTouchedTheIsland = false;
 
             foreach (Cargo cargo in allCargoOfTheGame)
             {
@@ -794,6 +783,8 @@ namespace MrSanmi.RecollectionSnooker
             }
 
             shipPivotOfTheGame.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+
+            shipOfTheGame.StateMechanic(TokenStateMechanic.SET_PHYSICS);
         }
 
         #endregion
@@ -840,6 +831,8 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeCannonCargoState()
         {
+            shipOfTheGame.StateMechanic(TokenStateMechanic.SET_PHYSICS);
+
             _nearestCargoToTheShip?.gameObject.SetActive(true);
             _nearestCargoToTheShip = null;
             _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
@@ -906,23 +899,34 @@ namespace MrSanmi.RecollectionSnooker
 
                 _cargoToBeLoaded.StateMechanic(TokenStateMechanic.SET_SPOOKY);
             }
-            else if (_shipPivotHasTouchedTheIsland)
+            if (_shipPivotHasTouchedTheIsland)
             {
-                ChangeCameraTo(islandVirtualCamera);
+                //ChangeCameraTo(islandVirtualCamera);
 
-                foreach (Cargo cargo in allCargoOfTheGame)
+                //foreach (Cargo cargo in allCargoOfTheGame)
+                //{
+                //    if (cargo != _cargoToBeLoaded && !cargo.IsLoadedOnTheShip)
+                //    {
+                //        cargo.gameObject.SetActive(false);
+                //    }
+                //    else if (cargo.IsLoadedOnTheShip)
+                //    {
+                //        cargo.gameObject.SetActive(false);
+                //    }
+                //}
+
+                print("LOAD MEEEEEEEEEEEEE!");
+                foreach (Cargo cargo in shipOfTheGame._cargoesLoadedOnTheShip)
                 {
-                    if (cargo != _cargoToBeLoaded && !cargo.IsLoadedOnTheShip)
+                    if (!islandOfTheGame._cargoesLoadedOnIsland.Contains(cargo))
                     {
-                        cargo.gameObject.SetActive(false);
-                    }
-                    else if (cargo.IsLoadedOnTheShip)
-                    {
-                        cargo.gameObject.SetActive(false);
+                        islandOfTheGame._cargoesLoadedOnIsland.Add(cargo);
+                        shipOfTheGame._cargoesLoadedOnTheShip.Remove(cargo);
+                        break;
                     }
                 }
 
-                _cargoToBeLoaded.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+                GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
             }
         }
 
@@ -938,7 +942,7 @@ namespace MrSanmi.RecollectionSnooker
                 cargo.gameObject.SetActive(true);
             }
 
-            _cargoToBeLoaded.gameObject.SetActive(true);
+            _cargoToBeLoaded?.gameObject.SetActive(true);
 
             _cargoToBeLoaded = null;
 
