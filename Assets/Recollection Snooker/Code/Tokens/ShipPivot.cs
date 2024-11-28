@@ -40,7 +40,7 @@ namespace MrSanmi.RecollectionSnooker
         {
             OnTriggerEvent(other);
 
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.FLICK_TOKEN_BY_PLAYER:
                     ValidateTriggerWithFlag(other);
@@ -50,7 +50,7 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnCollisionEnter(Collision other)
         {
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.CANNON_BY_NAVIGATION:
                     ValidateCollisionOfTheIslandByShipPivot(other);
@@ -60,7 +60,7 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnCollisionStay(Collision other)
         {
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.CANNON_CARGO:
                 case RS_GameStates.CANNON_BY_NAVIGATION:

@@ -84,7 +84,7 @@ namespace MrSanmi.RecollectionSnooker
             //base.OnTriggerEnterEvent(other);
             OnTriggerEvent(other);
             //Validation exclusively for the CARGO
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
                     if (_gameReferee._aCargoHasTouchedTheShip)
@@ -101,7 +101,7 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnCollisionEnter(Collision other)
         {
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.CANNON_CARGO:
                 case RS_GameStates.CANNON_BY_NAVIGATION:

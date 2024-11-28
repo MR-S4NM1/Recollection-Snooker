@@ -64,7 +64,7 @@ namespace MrSanmi.RecollectionSnooker
             _gameReferee.DebugInMobile(gameObject.name +
                 " OnCollisionEnter() - Detected collision with " +
                 other.gameObject.name);
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.CANNON_CARGO:
                 case RS_GameStates.CANNON_BY_NAVIGATION:
@@ -75,7 +75,7 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnCollisionStay(Collision other)
         {
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.CANNON_CARGO:
                 case RS_GameStates.CANNON_BY_NAVIGATION:
@@ -156,7 +156,7 @@ namespace MrSanmi.RecollectionSnooker
         {
             _gameReferee.DebugInMobile(" Validate Collision " + other.gameObject.name);
             //cases for every type of TOKEN
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             { 
                 case RS_GameStates.FLICK_TOKEN_BY_PLAYER:
                     _gameReferee.DebugInMobile("FLICK_TOKEN_BY_PLAYER " + other.gameObject.name);

@@ -49,14 +49,9 @@ namespace MrSanmi.RecollectionSnooker
             //_cargosPos = new List<float>();  //runtime variable
         }
 
-        void Update()
-        {
-
-        }
-
         private void OnCollisionEnter(Collision other)
         {
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.CANNON_CARGO:
                     ValidateShipHasTouchedACargoDuringCannonCollision(other);
@@ -74,7 +69,7 @@ namespace MrSanmi.RecollectionSnooker
         private void OnTriggerEnter(Collider other)
         {
             OnTriggerEvent(other);
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.CANNON_CARGO:
                     ValidateShipHasTouchedACargoDuringCannon(other);

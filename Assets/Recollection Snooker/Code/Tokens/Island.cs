@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using System.Linq;
 
@@ -45,7 +44,7 @@ namespace MrSanmi.RecollectionSnooker
         private void OnTriggerEnter(Collider other)
         {
             OnTriggerEvent(other);
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.CANNON_BY_NAVIGATION:
                     ValidateIslandHasTouchedTheShipPivotDuringCannonByNavigationTrigger(other);
@@ -58,7 +57,7 @@ namespace MrSanmi.RecollectionSnooker
 
         private void OnCollisionEnter(Collision other)
         {
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.CANNON_BY_NAVIGATION:
                     ValidateIslandHasTouchedTheShipPivotDuringCannonByNavigationCollision(other);

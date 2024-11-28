@@ -39,7 +39,7 @@ namespace MrSanmi.RecollectionSnooker
         #region PublicMehtods
         public void HandleRotateXSlider()
         {
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.FLICK_TOKEN_BY_PLAYER: //manage the flags
                     HandleRotationInFlickTokenByPlayerX(_rotateXSlider.value);
@@ -49,7 +49,7 @@ namespace MrSanmi.RecollectionSnooker
 
         public void HandleRotateYSlider()
         {
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.FLICK_TOKEN_BY_PLAYER: //manage the flags
                     HandleRotationInFlickTokenByPlayerY(_rotateYSlider.value);
@@ -76,7 +76,7 @@ namespace MrSanmi.RecollectionSnooker
 
         protected override void HandleTouchInputAction(InputAction.CallbackContext value)
         {
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.CHOOSE_TOKEN_BY_PLAYER:
                     HandleTouchInChooseTokenByPlayer(value);
@@ -92,7 +92,7 @@ namespace MrSanmi.RecollectionSnooker
 
         protected override void HandleRotateInputAction(InputAction.CallbackContext value)
         {
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.FLICK_TOKEN_BY_PLAYER: //manage the flags
                     HandleRotationInFlickTokenByPlayer(value);
@@ -103,7 +103,7 @@ namespace MrSanmi.RecollectionSnooker
         protected override void HandleTiltInputAction(InputAction.CallbackContext value)
         {
             Debug.Log("TIIIIIIIILTTTTTTTT");
-            switch (_gameReferee.GetGameState)
+            switch (_gameReferee.GameState)
             {
                 case RS_GameStates.FLICK_TOKEN_BY_PLAYER: //manage the flags
                     HandleRotationInFlickTokenByPlayer(value);
