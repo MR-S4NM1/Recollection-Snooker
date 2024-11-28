@@ -84,6 +84,9 @@ namespace MrSanmi.RecollectionSnooker
                 case RS_GameStates.CONTACT_POINT_TOKEN_BY_PLAYER:
                     HandleTouchInContactPointTokenByPlayer(value);
                     break;
+                case RS_GameStates.ANCHOR_SHIP:
+                    HandleTouchInAnchorShip(value);
+                    break;
                 case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
                     HandleTouchInLoadingCargoByPlayer(value);
                     break;
@@ -186,6 +189,38 @@ namespace MrSanmi.RecollectionSnooker
                 else
                 {
                     _goTouchCursor.SetActive(false);
+                }
+            }
+        }
+
+        protected void HandleTouchInAnchorShip(InputAction.CallbackContext value)
+        {
+            if (value.performed)
+            {
+                if (Physics.Raycast(_camera.ScreenPointToRay(value.ReadValue<Vector2>()),
+                        out _raycastHit, 100.0f, LayerMask.GetMask("AnchorShipSpace")))
+                {
+                    _goTouchCursor.SetActive(true);
+                    _goTouchCursor.transform.position = _raycastHit.point;
+                    _gameReferee.CargoToBeLoaded.gameObject.transform.position = Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,
+                        _raycastHit.point, 0.5f);
+                }
+                else
+                {
+                    _goTouchCursor.SetActive(false);
+                }
+            }
+            else if (value.canceled)
+            {
+                _goTouchCursor.SetActive(false);
+                if (_gameReferee._shipPivotHasTouchedTheIsland)
+                {
+                    print("HEAR MEEEEEEEEEEEEEEEEEEEEEE!");
+                    _gameReferee.GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
+                }
+                else
+                {
+                    _gameReferee.GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
                 }
             }
         }

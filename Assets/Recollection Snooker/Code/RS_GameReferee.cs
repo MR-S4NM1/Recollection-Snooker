@@ -200,7 +200,8 @@ namespace MrSanmi.RecollectionSnooker
                     break;
                 case RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER:
                     if (_gameState == RS_GameStates.CANNON_CARGO ||
-                        _gameState == RS_GameStates.CANNON_BY_NAVIGATION)
+                        _gameState == RS_GameStates.ANCHOR_SHIP
+                        /*_gameState == RS_GameStates.CANNON_BY_NAVIGATION*/) // This was just for prototype
                     {
                         FinalizeCurrentState(toNextState);
                     }
@@ -216,14 +217,14 @@ namespace MrSanmi.RecollectionSnooker
                     if (_gameState == RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER ||
                         _gameState == RS_GameStates.MOVE_COUNTER_BY_SANCTION ||
                         _gameState == RS_GameStates.CANNON_CARGO ||
-                        _gameState == RS_GameStates.CANNON_BY_NAVIGATION)
+                        _gameState == RS_GameStates.ANCHOR_SHIP
+                        /*_gameState == RS_GameStates.CANNON_BY_NAVIGATION*/) //Prototype
                     {
                         FinalizeCurrentState(toNextState);
                     }
                     break;
                 case RS_GameStates.VICTORY_OF_THE_PLAYER:
-                    if (_gameState == RS_GameStates.NAVIGATING_SHIP_OF_THE_PLAYER ||
-                        _gameState == RS_GameStates.CHOOSE_TOKEN_BY_PLAYER)
+                    if (_gameState == RS_GameStates.CHOOSE_TOKEN_BY_PLAYER)
                     {
                         FinalizeCurrentState(toNextState);
                     }
@@ -259,17 +260,6 @@ namespace MrSanmi.RecollectionSnooker
         //Ship
         public void ActivateIsLoadedOnTheShipForAllCargoesOfTheSameType(CargoTypes cargoType)
         {
-            //if(shipOfTheGame._cargoesLoadedOnTheShip.Count > 0)
-            //{
-            //    foreach(Cargo cargo in shipOfTheGame._cargoesLoadedOnTheShip)
-            //    {
-            //        if (cargo.cargoType == cargoType)
-            //        {
-
-            //        }
-            //    }
-            //}
-
             switch (cargoType)
             {
                 case CargoTypes.SCREW_PART:
@@ -824,14 +814,11 @@ namespace MrSanmi.RecollectionSnooker
                 }
                 else
                 {
-                    if (_shipPivotHasTouchedTheIsland)
-                    {
-                        GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
-                    }
-                    else
-                    {
-                        GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
-                    }
+                    //if (!_shipPivotHasTouchedTheIsland)
+                    //{
+                    //    GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
+                    //}
+                    GameStateMechanic(RS_GameStates.NAVIGATING_SHIP_OF_THE_PLAYER);
                 }
             }
         }
@@ -858,7 +845,9 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeNavigatingShipOfThePlayerState()
         {
+            //LERP
 
+            GameStateMechanic(RS_GameStates.ANCHOR_SHIP);
         }
 
         protected void ExecutingNavigatingShipOfThePlayerState()
@@ -877,6 +866,17 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeAnchorShipState()
         {
+            //if (_shipPivotHasTouchedTheIsland)
+            //{
+            //    print("HEAR MEEEEEEEEEEEEEEEEEEEEEE!");
+            //    GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
+            //}
+            //else
+            //{
+            //    GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+            //}
+
+            // Continues in RS_MobileInputHandler
 
         }
 
