@@ -222,7 +222,8 @@ namespace MrSanmi.RecollectionSnooker
                     }
                     break;
                 case RS_GameStates.VICTORY_OF_THE_PLAYER:
-                    if (_gameState == RS_GameStates.NAVIGATING_SHIP_OF_THE_PLAYER)
+                    if (_gameState == RS_GameStates.NAVIGATING_SHIP_OF_THE_PLAYER ||
+                        _gameState == RS_GameStates.CHOOSE_TOKEN_BY_PLAYER)
                     {
                         FinalizeCurrentState(toNextState);
                     }
@@ -657,6 +658,11 @@ namespace MrSanmi.RecollectionSnooker
 
             ChangeCameraTo(tableFreeLookCamera);
 
+            if(islandOfTheGame._cargoesLoadedOnIsland.Count >= 2)
+            {
+                GameStateMechanic(RS_GameStates.VICTORY_OF_THE_PLAYER);
+            }
+
             cargoSpaceOnShip.SetActive(false);
             //_originalPositionOfTheFlag = flag.transform.localPosition;
             _aCargoHasTouchedTheShip = false;
@@ -1022,15 +1028,13 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeMoveCounterBySanctionState()
         {
-            if(healthPoints <= 1)
+            if(healthPoints <= 0)
             {
-                print("You lose the game");
                 GameStateMechanic(RS_GameStates.FAILURE_OF_THE_PLAYER);
             }
-            else if(healthPoints > 1)
+            else if(healthPoints >= 1)
             {
                 healthPoints -= 1;
-                print("You lose a life");
                 GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
             }
         }
@@ -1080,7 +1084,7 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeVictoryOfThePlayerState()
         {
-
+            print("Player has won!");
         }
 
         protected void ExecutingVictoryOfThePlayerState()
@@ -1099,7 +1103,7 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeFailureOfThePlayerState()
         {
-
+            print("Player has lost!");
         }
 
         protected void ExecutingFailureOfThePlayerState()

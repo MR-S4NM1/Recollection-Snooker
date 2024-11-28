@@ -77,6 +77,14 @@ namespace MrSanmi.RecollectionSnooker
         private void OnCollisionStay(Collision other)
         {
             ValidateCollisionsByCargo(other);
+
+            switch (_gameReferee.GameState)
+            {
+                case RS_GameStates.CANNON_CARGO:
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateCollisionDuringCannon(other);
+                    break;
+            }
         }
 
         private void OnTriggerEnter(Collider other)

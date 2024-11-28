@@ -56,6 +56,14 @@ namespace MrSanmi.RecollectionSnooker
                     ValidateCollisionOfTheIslandByShipPivot(other);
                     break;
             }
+
+            switch (_gameReferee.GameState)
+            {
+                case RS_GameStates.CANNON_CARGO:
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateCollisionDuringCannon(other);
+                    break;
+            }
         }
 
         private void OnCollisionStay(Collision other)
