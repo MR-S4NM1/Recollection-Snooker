@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MrSanmi.Game;
 using Cinemachine;
 using TMPro;
 using Unity.VisualScripting;
@@ -38,6 +37,9 @@ namespace MrSanmi.RecollectionSnooker
     {
         #region References
 
+        [Header("General Game Referee")]
+        [SerializeField] protected GameReferee _generalGameReferee;
+
         //Polymorphism by prefab variants and code
         //for every type of token in the game
         [Header("Token References")]
@@ -50,10 +52,12 @@ namespace MrSanmi.RecollectionSnooker
         [SerializeField] protected Transform[] cargoPositionsOnShip;
         [SerializeField] protected Transform[] cargoPositionsOnIsland;
         [SerializeField] protected GameObject cargoSpaceOnShip;
+        [SerializeField] protected GameObject anchorShipSpace;
 
         [Header("Camera References")]
         [SerializeField] protected CinemachineFreeLook tableFreeLookCamera;
         [SerializeField] protected CinemachineVirtualCamera shipVirtualCamera;
+        [SerializeField] protected CinemachineVirtualCamera anchorShipVirtualCamera;
         //[SerializeField] protected CinemachineVirtualCamera islandVirtualCamera;
 
         [Header("Flags")]
@@ -71,7 +75,7 @@ namespace MrSanmi.RecollectionSnooker
 
         #region RuntimeVariables
 
-        protected new RS_GameStates _gameState;
+        protected RS_GameStates _gameState;
         protected CinemachineVirtualCameraBase _currentVirtualCameraBase;
         protected Token _interactedToken;
         [SerializeField] protected bool _isAllCargoStill;
@@ -82,11 +86,22 @@ namespace MrSanmi.RecollectionSnooker
         public bool _aCargoHasTouchedTheShip;
         protected Vector3 _originalPositionOfTheFlag;
         public bool _shipPivotHasTouchedTheIsland;
+        protected float distanceBetweenShipAndPivot;
 
 
         #endregion
 
         #region UnityMethods
+
+        private void OnDrawGizmos()
+        {
+            #if UNITY_EDITOR
+            if(_generalGameReferee == null)
+            {
+                _generalGameReferee = GameObject.FindObjectOfType<GameReferee>(true);
+            }
+            #endif
+        }
 
         void Start()
         {
@@ -458,7 +473,7 @@ namespace MrSanmi.RecollectionSnooker
             return _isAllCargoStill;
         }
 
-        protected override void InitializeGameReferee()
+        protected void InitializeGameReferee()
         {
             _gameState = RS_GameStates.SHOW_THE_LAYOUT_TO_THE_PLAYER;  //(RS_GameStates)0;
             //InitializeDropCargoState();
@@ -599,10 +614,15 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeShowTheLayoutToThePlayerState()
         {
+            UIManager.instance._confirmStateChange = false;
+            UIManager.instance._confirmLoad = false;
+
             //_originalPositionOfTheFlag = flag.transform.localPosition;
             _aCargoHasTouchedTheShip = false;
             _gameRefereeHasConfirmedThatACargoOrShipPivotHasTouchedAMonsterPart = false;
             _shipPivotHasTouchedTheIsland = false;
+
+            anchorShipSpace.SetActive(false);
 
             //TODO: Make the proper initialization of the state
 
@@ -648,7 +668,7 @@ namespace MrSanmi.RecollectionSnooker
 
             ChangeCameraTo(tableFreeLookCamera);
 
-            if(islandOfTheGame._cargoesLoadedOnIsland.Count >= 2)
+            if(islandOfTheGame._cargoesLoadedOnIsland.Count >= 5)
             {
                 GameStateMechanic(RS_GameStates.VICTORY_OF_THE_PLAYER);
             }
@@ -675,7 +695,7 @@ namespace MrSanmi.RecollectionSnooker
                 }
             }
 
-            for (int i = 0; i < 5; ++i)
+            for (int i = 0; i < 4; ++i)
             {
                 if (allCargoOfTheGame[i]._isLoadedOnTheIsland && !allCargoOfTheGame[i].IsLoadedOnTheShip)
                 {
@@ -846,13 +866,40 @@ namespace MrSanmi.RecollectionSnooker
         protected void InitializeNavigatingShipOfThePlayerState()
         {
             //LERP
+            distanceBetweenShipAndPivot = 0;
+            distanceBetweenShipAndPivot = Vector3.SqrMagnitude(shipOfTheGame.gameObject.transform.position - shipPivotOfTheGame.gameObject.transform.position);
 
-            GameStateMechanic(RS_GameStates.ANCHOR_SHIP);
+            //while (distanceBetweenShipAndPivot > 3.0f)
+            //{
+            //    shipOfTheGame.gameObject.transform.position = Vector3.Lerp(shipOfTheGame.gameObject.transform.position,
+            //        shipPivotOfTheGame.gameObject.transform.position, Time.fixedDeltaTime * 2.0f);
+            //}
+            //GameStateMechanic(RS_GameStates.ANCHOR_SHIP);
         }
 
         protected void ExecutingNavigatingShipOfThePlayerState()
         {
+            distanceBetweenShipAndPivot = Vector3.SqrMagnitude(shipOfTheGame.gameObject.transform.position - shipPivotOfTheGame.gameObject.transform.position);
 
+            if(distanceBetweenShipAndPivot > 10.0f)
+            {
+                shipOfTheGame.gameObject.transform.position = Vector3.Lerp(shipOfTheGame.gameObject.transform.position,
+                    shipPivotOfTheGame.gameObject.transform.position, Time.fixedDeltaTime);
+            }
+            else if (distanceBetweenShipAndPivot <= 9.99f)
+            {
+                GameStateMechanic(RS_GameStates.ANCHOR_SHIP);
+            }
+
+            //while (distanceBetweenShipAndPivot > 3.0f)
+            //{
+            //    shipOfTheGame.gameObject.transform.position = Vector3.Lerp(shipOfTheGame.gameObject.transform.position,
+            //        shipPivotOfTheGame.gameObject.transform.position, Time.fixedDeltaTime * 2.0f);
+            //}
+            //if(distanceBetweenShipAndPivot <= 2.95f)
+            //{
+            //    GameStateMechanic(RS_GameStates.ANCHOR_SHIP);
+            //}
         }
 
         protected void FinalizeNavigatingShipOfThePlayerState()
@@ -866,7 +913,10 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeAnchorShipState()
         {
-            //if (_shipPivotHasTouchedTheIsland)
+            UIManager.instance._confirmStateChange = false;
+            UIManager.instance._confirmLoad = false;
+
+            //if (_shipPivotHasTouchedTheIsland) //Prototype in order to test states changes
             //{
             //    print("HEAR MEEEEEEEEEEEEEEEEEEEEEE!");
             //    GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
@@ -878,6 +928,10 @@ namespace MrSanmi.RecollectionSnooker
 
             // Continues in RS_MobileInputHandler
 
+            ChangeCameraTo(anchorShipVirtualCamera);
+            shipPivotOfTheGame.gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+            anchorShipSpace.gameObject.SetActive(true);
+
         }
 
         protected void ExecutingAnchorShipState()
@@ -887,7 +941,7 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void FinalizeAnchorShipState()
         {
-
+            anchorShipSpace.SetActive(false);
         }
 
         #endregion
@@ -953,6 +1007,9 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeLoadingAndOrganizingCargoByPlayerState()
         {
+            UIManager.instance._confirmStateChange = false;
+            UIManager.instance._confirmLoad = false;
+
             if (_aCargoHasTouchedTheShip)
             {
                 ChangeCameraTo(shipVirtualCamera);
@@ -1030,11 +1087,13 @@ namespace MrSanmi.RecollectionSnooker
         {
             if(healthPoints <= 0)
             {
+                UIManager.instance.UpdatePlayerLife(healthPoints);
                 GameStateMechanic(RS_GameStates.FAILURE_OF_THE_PLAYER);
             }
             else if(healthPoints >= 1)
             {
                 healthPoints -= 1;
+                UIManager.instance.UpdatePlayerLife(healthPoints);
                 GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
             }
         }
@@ -1084,7 +1143,8 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeVictoryOfThePlayerState()
         {
-            print("Player has won!");
+            //print("Player has won!");
+            _generalGameReferee.WinGame();
         }
 
         protected void ExecutingVictoryOfThePlayerState()
@@ -1103,7 +1163,8 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeFailureOfThePlayerState()
         {
-            print("Player has lost!");
+            //print("Player has lost!");
+            _generalGameReferee.LoseGame();
         }
 
         protected void ExecutingFailureOfThePlayerState()
@@ -1150,6 +1211,11 @@ namespace MrSanmi.RecollectionSnooker
         {
             set { _cargoToBeLoaded = value; }
             get { return _cargoToBeLoaded; }
+        }
+
+        public int GetHealthPoints
+        {
+            get { return healthPoints; }
         }
 
         #endregion

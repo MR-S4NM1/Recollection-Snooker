@@ -95,66 +95,76 @@ namespace MrSanmi.RecollectionSnooker
 
         public void ValidateSpaceToSpawnMonsterPart()
         {
-            maxAttempsToChangePositionInShiftMonsterPart = 100;
-            canBePlacedAtThePosition = false;
-            _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+            //maxAttempsToChangePositionInShiftMonsterPart = 100;
+            //canBePlacedAtThePosition = false;
+            //_tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
 
-            while (!canBePlacedAtThePosition && maxAttempsToChangePositionInShiftMonsterPart > 0)
+            //while (!canBePlacedAtThePosition && maxAttempsToChangePositionInShiftMonsterPart > 0)
+            //{
+            //    _randomPosToPlaceToken = new Vector3(Random.Range(-22, 22), 0, Random.Range(-22, 22));
+            //    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 3.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
+            //    {
+            //        if (!_raycastHit.collider.gameObject.GetComponent<Token>())
+            //        {
+            //            canBePlacedAtThePosition = true;
+            //            _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_PHYSICS);
+            //            transform.position = _randomPosToPlaceToken;
+            //        }
+            //        else
+            //        {
+            //            maxAttempsToChangePositionInShiftMonsterPart -= 1;
+            //        }
+            //    }
+            //}
+
+            if (monsterPartType == MonsterPartType.HEAD)
             {
-                _randomPosToPlaceToken = new Vector3(Random.Range(-22, 22), 0, Random.Range(-22, 22));
-                if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 3.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
+                maxAttempsToChangePositionInShiftMonsterPart = 100;
+                canBePlacedAtThePosition = false;
+                _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+
+                while (!canBePlacedAtThePosition && maxAttempsToChangePositionInShiftMonsterPart > 0)
                 {
-                    if (!_raycastHit.collider.gameObject.GetComponent<Token>())
+                    _randomPosToPlaceToken = new Vector3(Random.Range(-22, 22), 0, Random.Range(-22, 22));
+                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 4.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
                     {
-                        canBePlacedAtThePosition = true;
-                        _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_PHYSICS);
-                        transform.position = _randomPosToPlaceToken;
-                    }
-                    else
-                    {
-                        maxAttempsToChangePositionInShiftMonsterPart -= 1;
+                        if (!_raycastHit.collider.gameObject.GetComponent<Token>())
+                        {
+                            canBePlacedAtThePosition = true;
+                            _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_PHYSICS);
+                            transform.position = _randomPosToPlaceToken;
+                        }
+                        else
+                        {
+                            maxAttempsToChangePositionInShiftMonsterPart -= 1;
+                        }
                     }
                 }
             }
+            else if (monsterPartType == MonsterPartType.LIMB)
+            {
+                maxAttempsToChangePositionInShiftMonsterPart = 100;
+                canBePlacedAtThePosition = false;
+                _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
 
-            //if (monsterPartType == MonsterPartType.HEAD)
-            //{
-            //    canBePlacedAtThePosition = false;
-
-            //    while (!canBePlacedAtThePosition)
-            //    {
-            //        _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
-            //        _randomPosToPlaceToken = new Vector3(Random.Range(-22, 22), 0, Random.Range(-22, 22));
-            //        if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 6.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
-            //        {
-            //            if (!_raycastHit.collider.gameObject.GetComponent<Token>())
-            //            {
-            //                canBePlacedAtThePosition = true;
-            //                _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_PHYSICS);
-            //                transform.position = _randomPosToPlaceToken;
-            //            }
-            //        }
-            //    }
-            //}
-            //else if (monsterPartType == MonsterPartType.LIMB)
-            //{
-            //    canBePlacedAtThePosition = false;
-
-            //    while (!canBePlacedAtThePosition)
-            //    {
-            //        _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_SPOOKY);
-            //        _randomPosToPlaceToken = new Vector3(Random.Range(-22, 22), 0, Random.Range(-22, 22));
-            //        if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 6.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
-            //        {
-            //            if (!_raycastHit.collider.gameObject.GetComponent<Token>())
-            //            {
-            //                canBePlacedAtThePosition = true;
-            //                _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_PHYSICS);
-            //                transform.position = _randomPosToPlaceToken;
-            //            }
-            //        }
-            //    }
-            //}
+                while (!canBePlacedAtThePosition && maxAttempsToChangePositionInShiftMonsterPart > 0)
+                {
+                    _randomPosToPlaceToken = new Vector3(Random.Range(-22, 22), 0, Random.Range(-22, 22));
+                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 3.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
+                    {
+                        if (!_raycastHit.collider.gameObject.GetComponent<Token>())
+                        {
+                            canBePlacedAtThePosition = true;
+                            _tokenPhysicalFSM.StateMechanic(TokenStateMechanic.SET_PHYSICS);
+                            transform.position = _randomPosToPlaceToken;
+                        }
+                        else
+                        {
+                            maxAttempsToChangePositionInShiftMonsterPart -= 1;
+                        }
+                    }
+                }
+            }
         }
 
         #endregion

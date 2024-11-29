@@ -37,6 +37,48 @@ namespace MrSanmi.RecollectionSnooker
         #endregion
 
         #region PublicMehtods
+
+        public void ChangeFromAnchorShipToNextState()
+        {
+            if(_gameReferee.GameState == RS_GameStates.ANCHOR_SHIP)
+            {
+                //if (UIManager.instance._confirmLoad)
+                //{
+                    if (UIManager.instance._confirmStateChange)
+                    {
+                        _goTouchCursor.SetActive(false);
+                        if (_gameReferee._shipPivotHasTouchedTheIsland)
+                        {
+                            print("HEAR MEEEEEEEEEEEEEEEEEEEEEE!");
+                            _gameReferee.GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
+                        }
+                        else
+                        {
+                            _gameReferee.GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+                        }
+                    }
+                //}
+            }
+        }
+
+        public void ChangeFromLoadingCargoByPlayerStateOnShipToNext()
+        {
+            if (!_gameReferee._aCargoHasTouchedTheShip)
+            {
+                return;
+            }
+            if (_gameReferee.GameState == RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER)
+            {
+                //if (UIManager.instance._confirmLoad)
+                //{
+                    if (UIManager.instance._confirmStateChange)
+                    {
+                        _gameReferee.GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+                    }
+                //}
+            }
+        }
+
         public void HandleRotateXSlider()
         {
             switch (_gameReferee.GameState)
@@ -202,7 +244,7 @@ namespace MrSanmi.RecollectionSnooker
                 {
                     _goTouchCursor.SetActive(true);
                     _goTouchCursor.transform.position = _raycastHit.point;
-                    _gameReferee.CargoToBeLoaded.gameObject.transform.position = Vector3.Lerp(_gameReferee.CargoToBeLoaded.gameObject.transform.position,
+                    _gameReferee.shipOfTheGame.gameObject.transform.position = Vector3.Lerp(_gameReferee.shipOfTheGame.gameObject.transform.position,
                         _raycastHit.point, 0.5f);
                 }
                 else
@@ -212,15 +254,18 @@ namespace MrSanmi.RecollectionSnooker
             }
             else if (value.canceled)
             {
-                _goTouchCursor.SetActive(false);
-                if (_gameReferee._shipPivotHasTouchedTheIsland)
+                if (UIManager.instance._confirmStateChange)
                 {
-                    print("HEAR MEEEEEEEEEEEEEEEEEEEEEE!");
-                    _gameReferee.GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
-                }
-                else
-                {
-                    _gameReferee.GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+                    _goTouchCursor.SetActive(false);
+                    if (_gameReferee._shipPivotHasTouchedTheIsland)
+                    {
+                        print("HEAR MEEEEEEEEEEEEEEEEEEEEEE!");
+                        _gameReferee.GameStateMechanic(RS_GameStates.LOADING_AND_ORGANIZING_CARGO_BY_PLAYER);
+                    }
+                    else
+                    {
+                        _gameReferee.GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+                    }
                 }
             }
         }
@@ -265,7 +310,11 @@ namespace MrSanmi.RecollectionSnooker
             else if (value.canceled)
             {
                 _goTouchCursor.SetActive(false);
-                _gameReferee.GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+
+                if (UIManager.instance._confirmStateChange)
+                {
+                    _gameReferee.GameStateMechanic(RS_GameStates.SHIFT_MONSTER_PARTS);
+                }
             }
         }
 
