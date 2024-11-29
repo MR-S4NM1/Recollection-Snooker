@@ -44,10 +44,10 @@ namespace MrSanmi.RecollectionSnooker
     {
         #region References
 
-        [SerializeField,HideInInspector] protected Rigidbody _rigidbody;
-        [SerializeField,HideInInspector] protected MeshCollider _meshCollider;
-        [SerializeField,HideInInspector] protected MeshCollider _meshTrigger;
-        [SerializeField,HideInInspector] protected MeshRenderer _meshRenderer;
+        [SerializeField] protected Rigidbody _rigidbody;
+        [SerializeField] protected MeshCollider _meshCollider;
+        [SerializeField] protected MeshCollider _meshTrigger;
+        [SerializeField] protected MeshRenderer _meshRenderer;
 
         #endregion
 
