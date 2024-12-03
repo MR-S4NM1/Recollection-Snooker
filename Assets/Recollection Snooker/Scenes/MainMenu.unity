@@ -726,10 +726,11 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1515595796}
-        m_TargetAssemblyTypeName: MrSanmi.RecollectionSnooker.SceneChanger, Assembly-CSharp
-        m_MethodName: 
-        m_Mode: 3
+      - m_Target: {fileID: 1515595799}
+        m_TargetAssemblyTypeName: MrSanmi.RecollectionSnooker.UIManagerMainTitle,
+          Assembly-CSharp
+        m_MethodName: ActivateCreditsPanel
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1238,7 +1239,7 @@ GameObject:
   - component: {fileID: 859085609}
   - component: {fileID: 859085608}
   m_Layer: 5
-  m_Name: CreditsButton
+  m_Name: BackButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1308,10 +1309,11 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1340452106}
-        m_TargetAssemblyTypeName: MrSanmi.RecollectionSnooker.SceneChanger, Assembly-CSharp
-        m_MethodName: ChangeSceneTo
-        m_Mode: 3
+      - m_Target: {fileID: 1515595799}
+        m_TargetAssemblyTypeName: MrSanmi.RecollectionSnooker.UIManagerMainTitle,
+          Assembly-CSharp
+        m_MethodName: ActivateMainPanel
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
