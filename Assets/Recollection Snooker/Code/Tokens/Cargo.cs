@@ -141,14 +141,18 @@ namespace MrSanmi.RecollectionSnooker
             {
                 _gameReferee.CargoToBeLoaded = this;
             }
-            if (_isLoadedOnTheShip)
-            {
-                if (other.gameObject.CompareTag("Floor"))
-                {
-                    _gameReferee.DeactivateIsLoadedOnTheShipForAllCargoesOfTheSameType(this.cargoType);
-                    _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Remove(this);
-                }
-            }
+            //if (other.gameObject.CompareTag("Cargo"))
+            //{
+            //    _gameReferee.GetCMTargetGroup.AddMember(this.gameObject.transform, 1, 0);
+            //}
+            //if (_isLoadedOnTheShip)
+            //{
+            //    if (other.gameObject.CompareTag("Floor"))
+            //    {
+            //        _gameReferee.DeactivateIsLoadedOnTheShipForAllCargoesOfTheSameType(this.cargoType);
+            //        _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Remove(this);
+            //    }
+            //}
         }
 
         protected void ValidateCollisionsByLoadingCargoOnShip(Collision other)
@@ -180,55 +184,6 @@ namespace MrSanmi.RecollectionSnooker
                 }
             }
         }
-
-        //Island
-        //protected void ValidateCollisionsByLoadingCargoOnIsland(Collision other)
-        //{
-        //    if (_isLoadedOnTheIsland) //If it's loaded, DON'T LOAD IT!
-        //    {
-        //        return;
-        //    }
-
-        //    if (other.gameObject.CompareTag("IslandCargoSpace"))
-        //    {
-
-        //        _isLoadedOnTheShip = false;
-        //        _isLoadedOnTheIsland = true;
-        //        _gameplayAttributes.isAvailableForFlicking = false;
-        //        _gameReferee.ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(this.cargoType);
-        //        _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Remove(this);
-
-        //        Add cargo to the list
-        //        if (!_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Contains(this))
-        //        {
-        //            _gameReferee.islandOfTheGame._cargoesLoadedOnIsland.Add(this);
-        //        }
-        //    }
-        //}
-
-        //protected void ValidateCargoHasBeenLoadedOnIsland(Collider other)
-        //{
-        //    if (_isLoadedOnTheIsland) //If it's loaded, DON'T LOAD IT!
-        //    {
-        //        return;
-        //    }
-
-        //    if (other.gameObject.CompareTag("IslandCargoSpace"))
-        //    {
-
-        //        _isLoadedOnTheShip = false;
-        //        _isLoadedOnTheIsland = true;
-
-        //        _gameReferee.ActivateIsLoadedOnTheIslandForAllCargoesOfTheSameType(this.cargoType);
-        //        _gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Remove(this);
-
-        //        Add cargo to the list
-        //        if (!_gameReferee.shipOfTheGame._cargoesLoadedOnTheShip.Contains(this))
-        //        {
-        //            _gameReferee.islandOfTheGame._cargoesLoadedOnIsland.Add(this);
-        //        }
-        //    }
-        //}
 
 
         #endregion

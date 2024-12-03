@@ -202,11 +202,13 @@ namespace MrSanmi.RecollectionSnooker
                     //tell the referee to suggest the jump to the cannon state
                     if (this as Cargo)
                     {
+                        //_gameReferee.GetCMTargetGroup.AddMember(this.gameObject.transform, 1, 0);
                         _gameReferee.GameStateMechanic(RS_GameStates.CANNON_CARGO);
                         _gameReferee.DebugInMobile("CANNON " + other.gameObject.name);
                     }
                     else if (this as ShipPivot)
                     {
+                        //_gameReferee.GetCMTargetGroup.AddMember(this.gameObject.transform, 1, 0);
                         _gameReferee.GameStateMechanic(RS_GameStates.CANNON_BY_NAVIGATION);
                     }
                 }

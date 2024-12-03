@@ -126,7 +126,7 @@ namespace MrSanmi.RecollectionSnooker
                 while (!canBePlacedAtThePosition && maxAttempsToChangePositionInShiftMonsterPart > 0)
                 {
                     _randomPosToPlaceToken = new Vector3(Random.Range(-22, 22), 0, Random.Range(-22, 22));
-                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 4.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
+                    if (Physics.SphereCast(new Vector3(_randomPosToPlaceToken.x, _randomPosToPlaceToken.y + 5.0f, _randomPosToPlaceToken.z), 6.0f, -transform.up * 1.0f, out _raycastHit, 5.0f))
                     {
                         if (!_raycastHit.collider.gameObject.GetComponent<Token>())
                         {

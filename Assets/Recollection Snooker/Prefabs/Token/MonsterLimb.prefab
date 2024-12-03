@@ -68,6 +68,22 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0.28097513
       objectReference: {fileID: 0}
+    - target: {fileID: 1573988764256414944, guid: 4304a871486b04f469d726538dfaa7e9, type: 3}
+      propertyPath: materialAssets.ghostMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 7e4f963f020e77c4b866bdb13e59ded6, type: 2}
+    - target: {fileID: 1573988764256414944, guid: 4304a871486b04f469d726538dfaa7e9, type: 3}
+      propertyPath: materialAssets.physicalMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 44fd48185de204440b653d6eb7589633, type: 2}
+    - target: {fileID: 1573988764256414944, guid: 4304a871486b04f469d726538dfaa7e9, type: 3}
+      propertyPath: materialAssets.highlightGhostMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: a55b77f53bb8dab429ca25f8e17e9642, type: 2}
+    - target: {fileID: 1573988764256414944, guid: 4304a871486b04f469d726538dfaa7e9, type: 3}
+      propertyPath: materialAssets.highlightPhysicalMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: d3879fb39243fe845a8c28f43138c498, type: 2}
     - target: {fileID: 2563213465842477368, guid: 4304a871486b04f469d726538dfaa7e9, type: 3}
       propertyPath: m_LocalPosition.x
       value: -8.974621

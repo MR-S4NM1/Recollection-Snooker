@@ -77,6 +77,17 @@ namespace MrSanmi.RecollectionSnooker
             }
         }
 
+        private void OnCollisionExit(Collision other)
+        {
+            switch (_gameReferee.GameState)
+            {
+                case RS_GameStates.CANNON_CARGO:
+                case RS_GameStates.CANNON_BY_NAVIGATION:
+                    ValidateCollisionDuringCannon(other);
+                    break;
+            }
+        }
+
         private void OnDrawGizmos()
         {
             #if UNITY_EDITOR

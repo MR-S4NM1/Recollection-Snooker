@@ -82,9 +82,14 @@ namespace MrSanmi.RecollectionSnooker
                     _rigidbody.velocity.magnitude < 0.1f &&
                     _rigidbody.angularVelocity.magnitude < 0.1f;
             }
-            else //STATIC or GHOST
+
+            else if (_physicalState == TokenPhysicalStates.GHOST)
             {
                 isStill = false;
+            }
+            else if(_physicalState == TokenPhysicalStates.STATIC)
+            {
+                isStill = true;
             }
         }
 

@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Recollection Snooker/Scenes/MainMenu.unity
+    guid: 52b02e27f204631419cb653e5b5047f5
+  - enabled: 1
+    path: Assets/Recollection Snooker/Scenes/Gameplay.unity
+    guid: 59dab59568a3d28438c596a50358c011
   m_configObjects: {}

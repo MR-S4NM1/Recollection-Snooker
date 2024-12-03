@@ -124,7 +124,7 @@ namespace MrSanmi.RecollectionSnooker
             //We calculate the distance between all cargo and the ship.
             for (int i = 0; i < _cargos.Length - 1; ++i)
             {
-                if (!_cargos[i].IsLoadedOnTheShip)
+                if (!_cargos[i].IsLoadedOnTheShip || !_cargos[i]._isLoadedOnTheIsland)
                 {
                     _currentDistance = Vector3.SqrMagnitude(this.gameObject.transform.position - _cargos[i].gameObject.transform.position);
                     //_cargosPos.Add(_currentDistance);
