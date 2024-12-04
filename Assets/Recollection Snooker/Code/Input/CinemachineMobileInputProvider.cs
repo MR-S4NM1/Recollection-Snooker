@@ -87,7 +87,7 @@ namespace MrSanmi.RecollectionSnooker
                             }
                             else
                             {
-                                return action.ReadValue<Vector3>().x;
+                                return action.ReadValue<Vector3>().y;
                             }
                         case 1:
                             if (_iSliderXAction)
@@ -97,7 +97,7 @@ namespace MrSanmi.RecollectionSnooker
                             }
                             else
                             {
-                                return action.ReadValue<Vector3>().y;
+                                return action.ReadValue<Vector3>().x;
                             }
                         case 2: return action.ReadValue<float>();
                     }

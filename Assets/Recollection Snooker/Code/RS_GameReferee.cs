@@ -789,6 +789,7 @@ namespace MrSanmi.RecollectionSnooker
             _nearestCargoToTheShip = shipOfTheGame.NearestCargo();
             _nearestCargoToTheShip.IsAvalaibleForFlicking = false;
             _nearestCargoToTheShip.SetHighlight(false);
+            print(_nearestCargoToTheShip.gameObject.name);
 
 
             //TODO: Set Spooky for ships, monster parts and ship pivots
@@ -806,7 +807,7 @@ namespace MrSanmi.RecollectionSnooker
         protected void FinalizeChooseTokenByPlayerState()
         {
             //table free look camera
-            _currentVirtualCameraBase.Priority = 1;
+            //_currentVirtualCameraBase.Priority = 1;
         }
 
         #endregion ChooseTokenByPlayer
@@ -817,8 +818,10 @@ namespace MrSanmi.RecollectionSnooker
         {
             _interactedToken.StateMechanic(TokenStateMechanic.SET_PHYSICS);
             //Focus to the camera rig of the selected token
-            _currentVirtualCameraBase = _interactedToken.GetFreeLookCamera;
-            _currentVirtualCameraBase.Priority = 1000;
+            //_currentVirtualCameraBase = _interactedToken.GetFreeLookCamera;
+            //_currentVirtualCameraBase.Priority = 1000;
+
+            ChangeCameraTo(_interactedToken.GetFreeLookCamera);
         }
 
         protected void ExecutingContactPointTokenByPlayerState()
@@ -938,6 +941,11 @@ namespace MrSanmi.RecollectionSnooker
 
         protected void InitializeNavigatingShipOfThePlayerState()
         {
+            foreach(MonsterPart monsterPart in allMonsterPartOfTheGame)
+            {
+                monsterPart.StateMechanic(TokenStateMechanic.SET_SPOOKY);
+            }
+
             //LERP
             distanceBetweenShipAndPivot = 0;
             distanceBetweenShipAndPivot = Vector3.SqrMagnitude(shipOfTheGame.gameObject.transform.position - shipPivotOfTheGame.gameObject.transform.position);
@@ -956,8 +964,8 @@ namespace MrSanmi.RecollectionSnooker
 
             if(distanceBetweenShipAndPivot >= 20.0f)
             {
-                shipOfTheGame.gameObject.transform.position = Vector3.Lerp(shipOfTheGame.gameObject.transform.position,
-                    shipPivotOfTheGame.gameObject.transform.position, Time.fixedDeltaTime);
+                shipOfTheGame.gameObject.transform.position = Vector3.MoveTowards(shipOfTheGame.gameObject.transform.position,
+                    shipPivotOfTheGame.gameObject.transform.position, Time.fixedDeltaTime * 3.0f);
             }
             else if (distanceBetweenShipAndPivot <= 19.99f)
             {
