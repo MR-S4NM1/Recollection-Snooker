@@ -37,7 +37,6 @@ namespace MrSanmi.RecollectionSnooker
         //TODO:Assign remaining references to other Token child prefabs
         [SerializeField] protected CinemachineFreeLook _freeLookCamera;
         [SerializeField] protected RS_GameReferee _gameReferee;
-        [SerializeField] protected Transform _flagTransformValues;
 
         #endregion
 
@@ -45,7 +44,6 @@ namespace MrSanmi.RecollectionSnooker
 
         [Header("Runtime Variables")]
         [SerializeField] protected GameplayAttributes _gameplayAttributes;
-        protected Transform _flagTransform;
         protected Flag _contactedFlag;
         protected bool _cargoOrShipPivotHasTouchedAMonsterPart;
         protected bool _shipPivotHasTouchedACargo;
@@ -119,10 +117,6 @@ namespace MrSanmi.RecollectionSnooker
             {
                 _gameReferee = GameObject.FindAnyObjectByType<RS_GameReferee>();
             }
-            if (_flagTransformValues == null)
-            {
-                _flagTransformValues = transform.GetChild(1).transform;
-            }
             if (_freeLookCamera == null)
             {
                 _freeLookCamera = transform.GetChild(0).GetChild(0).GetComponent<CinemachineFreeLook>();
@@ -176,30 +170,10 @@ namespace MrSanmi.RecollectionSnooker
                 _gameReferee.DebugInMobile("I am a Cargo or ShipPivot " + other.gameObject.name);
                 if (other.gameObject.CompareTag("Flag")) //other = flag
                 {
-                    _gameReferee.DebugInMobile("I detected a flag " + other.gameObject.name);
-                    //Obtain the push direction
-                    //by obtaining the rotation in the X axis
-                    _flagTransform = other.gameObject.transform; //pointer refrence
-                    //_flagTransformValues = _flagTransform; //NO USE: pointer reference
-                    _flagTransformValues.forward = _flagTransform.forward; //copy values by Vector3
-                    _flagTransformValues.position = _flagTransform.position; //copy values by Vector3
-                    //and adding -90° to obtained direction
-                    _flagTransformValues.Rotate(
-                        _flagTransformValues.right, //my own X axis
-                        -90f,
-                        Space.Self //localRotation
-                        );
+                    _contactedFlag = other.gameObject.GetComponent<Flag>();
+                    _tokenPhysicalFSM.ThrowTokenAtSpecificPosition(other.gameObject.transform.GetChild(0).forward * (Mathf.Abs(_contactedFlag.DeltaXDegrees + 1f * 5)),
+                        other.gameObject.transform.position);
 
-                    _contactedFlag = _flagTransform.gameObject.GetComponent<Flag>();
-                    //TODO: Project a Raycast from the tip of the flag to the Token,
-                    //to obtain the point of contact
-                    //other.contacts[0].point it gives us the specefic point of contact
-                    _tokenPhysicalFSM.ThrowTokenAtSpecificPosition(
-                        _flagTransformValues.forward * (Mathf.Abs(_contactedFlag.DeltaXDegrees) + 1f * 4.0f),
-                        other.gameObject.transform.position
-                        ); // other.contacts[0].point);
-
-                    //tell the referee to suggest the jump to the cannon state
                     if (this as Cargo)
                     {
                         //_gameReferee.GetCMTargetGroup.AddMember(this.gameObject.transform, 1, 0);
